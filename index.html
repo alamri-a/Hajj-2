@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>قياس مزدوج لإجراءات الحجاج</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<h2>قياس زمن إنهاء إجراءات الحاج - 1</h2>
+<div class="section">
+  <button class="big-button start-button" onclick="startTimer(1)">▶ بدء</button>
+  <button class="big-button stop-button" onclick="stopTimer(1)">■ إنهاء</button>
+  <div class="timer" id="timer1">00:00</div>
+
+  <div class="input-section">
+    <label>هل الحاج مسجل له بصمة سابقًا؟</label>
+    <input type="radio" name="fingerprint1" value="نعم" checked> نعم
+    <input type="radio" name="fingerprint1" value="لا"> لا
+  </div>
+
+  <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
+</div>
+
+<h2>قياس زمن إنهاء إجراءات الحاج - 2</h2>
+<div class="section">
+  <button class="big-button start-button" onclick="startTimer(2)">▶ بدء</button>
+  <button class="big-button stop-button" onclick="stopTimer(2)">■ إنهاء</button>
+  <div class="timer" id="timer2">00:00</div>
+
+  <div class="input-section">
+    <label>هل الحاج مسجل له بصمة سابقًا؟</label>
+    <input type="radio" name="fingerprint2" value="نعم" checked> نعم
+    <input type="radio" name="fingerprint2" value="لا"> لا
+  </div>
+
+  <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
+</div>
+
+<h2 style="text-align: right; margin-top: 40px;">
+  سجل الحجاج
+  <button onclick="saveTableAsPDF()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px; vertical-align: middle;">
+    💾 حفظ PDF
+  </button>
+</h2>
+
+<table id="logTable">
+  <thead>
+    <tr>
+      <th>التعداد</th>
+      <th>القياس</th>
+      <th>التاريخ</th>
+      <th>الساعة</th>
+      <th>المدة بالثواني</th>
+      <th>هل له بصمة؟</th>
+      <th>سبب التأخير</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<h3 id="averageTimeDisplay" style="text-align: center; margin-top: 20px;">متوسط الزمن: 0 ثانية</h3>
+
+<script src="script.js"></script>
+
+</body>
+</html>
