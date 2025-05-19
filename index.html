@@ -1,70 +1,0 @@
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <title>قياس إجراءات الحجاج</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/hijri-date/lib/hijri-date.js"></script>
-<script src="script.js" defer></script>
-
-
-</head>
-<body>
-
-<h2>قياس زمن إنهاء إجراءات الحاج</h2>
-<button onclick="clearData()" style="font-size: 14px; margin-bottom: 10px;">🗑️ مسح البيانات</button>
-
-<div class="section">
-  <button class="big-button start-button" onclick="startTimer(1)">▶ بدء</button>
-  <button class="big-button stop-button" onclick="stopTimer(1)">■ إنهاء</button>
-  <div class="timer" id="timer1">00:00</div>
-
-  <div class="input-section">
-    <label>هل الحاج مسجل له بصمة سابقًا؟</label>
-    <input type="radio" name="fingerprint1" value="نعم" checked> نعم
-    <input type="radio" name="fingerprint1" value="لا"> لا
-  </div>
-
-  <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
-</div>
-
-<table id="logTable">
-  <thead>
-    <tr>
-      <th>التعداد</th>
-      <th>التاريخ</th>
-      <th>الساعة</th>
-      <th>المدة بالثواني</th>
-      <th>مسجل له بصمة سابقًا؟</th>
-      <th>سبب التأخير</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-  <tfoot>
-    <tr style="background-color: #eee; font-weight: bold;">
-      <td colspan="6" id="unifiedAverageRow">متوسط الزمن العام: 0 ثانية — مسجل لهم بصمه: 0 ثانية — غير مسجل لهم: 0 ثانية</td>
-    </tr>
-  
-    <tr style="background-color: #f9f9f9; font-weight: bold;">
-      <td colspan="3"></td>
-      <td colspan="3" id="percentStats">مسجل لهم بصمة سابقا: 0% | غير مسجل لهم بصمة سابقا: 0%</td>
-    </tr>
-    </tfoot>
-    
-</table>
-
-<div style="text-align: center; margin-top: 30px; font-size: 16px;">
-  
-  <br><button onclick="saveAsPDF()">💾 حفظ PDF</button>
-  <button onclick="saveAsExcel()">📊 حفظ Excel</button>
-</div>
-
-</body>
-</html>
