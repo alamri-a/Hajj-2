@@ -1,4 +1,3 @@
-
 let startTime1, startTime2;
 let timerInterval1, timerInterval2;
 let count = 1;
@@ -44,6 +43,7 @@ function stopTimer(id) {
   }
 
   updateUnifiedAverage();
+  updatePercentRow();
 
   const date = now.toLocaleDateString('ar-EG');
   const time = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
@@ -52,7 +52,6 @@ function stopTimer(id) {
   const newRow = table.insertRow();
   newRow.innerHTML = `
     <td>${count++}</td>
-    
     <td>${date}</td>
     <td>${time}</td>
     <td>${duration}</td>
@@ -72,63 +71,7 @@ function updateUnifiedAverage() {
   const avgWithout = avg(withoutBiometric);
 
   document.getElementById("unifiedAverageRow").textContent =
-  const total = withBiometric.length + withoutBiometric.length;
-  const percent = v => total ? Math.round((v / total) * 100) : 0;
-  document.getElementById("percentStatsRow").textContent =
-    `نسبة المسجل لهم بصمة: ${percent(withBiometric.length)}% — نسبة غير المسجل لهم: ${percent(withoutBiometric.length)}%`;
     `متوسط الزمن العام: ${avgAll} ثانية — له بصمة: ${avgWith} ثانية — ماله بصمة: ${avgWithout} ثانية`;
-}
-
-function saveTableAsPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  html2canvas(document.querySelector("#logTable")).then(canvas => {
-    const imgData = canvas.toDataURL("image/png");
-    const imgProps = doc.getImageProperties(imgData);
-    const pdfWidth = doc.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-    doc.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight);
-    doc.save("سجل_الحجاج.pdf");
-  });
-}
-
-
-
-// Load saved data from localStorage on page load
-document.addEventListener("DOMContentLoaded", function () {
-    const savedRows = localStorage.getItem("hajjTableRows");
-    if (savedRows) {
-        const tbody = document.querySelector("#logTable tbody");
-        tbody.innerHTML = savedRows;
-    }
-});
-
-// Save current data to localStorage
-function saveTableData() {
-    const tbody = document.querySelector("#logTable tbody");
-    localStorage.setItem("hajjTableRows", tbody.innerHTML);
-}
-
-// Modify the function that adds rows to also call saveTableData
-function addRowToTable(rowData) {
-    const tbody = document.querySelector("#logTable tbody");
-    const row = document.createElement("tr");
-    row.innerHTML = rowData;
-    tbody.appendChild(row);
-    saveTableData();
-}
-
-function updateStats() {
-  updatePercentRow();
-}
-
-function updatePercentRow() {
-  const total = withBiometric.length + withoutBiometric.length;
-  const percent = v => total ? Math.round((v / total) * 100) : 0;
-  document.getElementById("percentRow").innerHTML =
-    `نسبة المسجل لهم بصمة: ${percent(withBiometric.length)}% — نسبة غير المسجل لهم: ${percent(withoutBiometric.length)}%`;
 }
 
 function updatePercentRow() {
@@ -151,8 +94,36 @@ function clearData() {
     const tbody = document.querySelector("#logTable tbody");
     tbody.innerHTML = "";
     count = 1;
-    allDurations = []; withBiometric = []; withoutBiometric = [];
+    allDurations = [];
+    withBiometric = [];
+    withoutBiometric = [];
     updateUnifiedAverage();
     updatePercentRow();
   }
+}
+
+// Load saved data from localStorage on page load
+document.addEventListener("DOMContentLoaded", function () {
+  const savedRows = localStorage.getItem("hajjTableRows");
+  if (savedRows) {
+    const tbody = document.querySelector("#logTable tbody");
+    tbody.innerHTML = savedRows;
+    count = tbody.rows.length + 1;
+    tbody.querySelectorAll("tr").forEach(row => {
+      const val = row.cells[4]?.textContent.trim();
+      const duration = parseInt(row.cells[3]?.textContent.trim());
+      if (!isNaN(duration)) {
+        allDurations.push(duration);
+        if (val === "نعم") withBiometric.push(duration);
+        else if (val === "لا") withoutBiometric.push(duration);
+      }
+    });
+    updateUnifiedAverage();
+    updatePercentRow();
+  }
+});
+
+function saveTableData() {
+  const tbody = document.querySelector("#logTable tbody");
+  localStorage.setItem("hajjTableRows", tbody.innerHTML);
 }
