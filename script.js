@@ -27,6 +27,11 @@ function startTimer(id) {
 }
 
 function stopTimer(id) {
+  if ((id === 1 && !startTime1) || (id === 2 && !startTime2)) {
+    alert("يرجى الضغط على زر البدء أولاً قبل الإنهاء.");
+    return;
+  }
+
   if (id === 1) clearInterval(timerInterval1);
   else clearInterval(timerInterval2);
 
@@ -131,4 +136,20 @@ function updatePercentRow() {
   const percent = v => total ? Math.round((v / total) * 100) : 0;
   document.getElementById("percentRow").textContent =
     `نسبة المسجل لهم بصمة: ${percent(countYes)}% — نسبة غير المسجل لهم: ${percent(countNo)}%`;
+}
+
+function clearData() {
+  if (confirm("هل أنت متأكد أنك تريد مسح جميع البيانات؟")) {
+    localStorage.removeItem("hajjTableRows");
+    const tbody = document.querySelector("#logTable tbody");
+    tbody.innerHTML = "";
+    count = 1;
+    allDurations = [];
+    withBiometric = [];
+    withoutBiometric = [];
+    document.getElementById("timer1").textContent = "00:00";
+    document.getElementById("timer2").textContent = "00:00";
+    updateUnifiedAverage();
+    updatePercentRow();
+  }
 }
