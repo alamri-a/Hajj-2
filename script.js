@@ -28,12 +28,15 @@ function startTimer(id) {
 
 function stopTimer(id) {
   if ((id === 1 && !startTime1) || (id === 2 && !startTime2)) {
-    alert("يرجى الضغط على زر البدء أولاً قبل الإنهاء.");
+    alert("يجب الضغط على زر البدء أولاً.");
     return;
   }
 
-  if (id === 1) clearInterval(timerInterval1);
-  else clearInterval(timerInterval2);
+  if (id === 1) {
+    clearInterval(timerInterval1);
+  } else {
+    clearInterval(timerInterval2);
+  }
 
   const now = new Date();
   const duration = Math.floor((now - (id === 1 ? startTime1 : startTime2)) / 1000);
@@ -65,6 +68,9 @@ function stopTimer(id) {
 
   document.getElementById(`timer${id}`).textContent = "00:00";
   document.getElementById(`delayReason${id}`).value = "";
+  if (id === 1) startTime1 = null;
+  else startTime2 = null;
+
   saveTableData();
   updatePercentRow();
 }
@@ -139,17 +145,15 @@ function updatePercentRow() {
 }
 
 function clearData() {
-  if (confirm("هل أنت متأكد أنك تريد مسح جميع البيانات؟")) {
-    localStorage.removeItem("hajjTableRows");
-    const tbody = document.querySelector("#logTable tbody");
-    tbody.innerHTML = "";
-    count = 1;
-    allDurations = [];
-    withBiometric = [];
-    withoutBiometric = [];
-    document.getElementById("timer1").textContent = "00:00";
-    document.getElementById("timer2").textContent = "00:00";
-    updateUnifiedAverage();
-    updatePercentRow();
-  }
+  localStorage.removeItem("hajjTableRows");
+  const tbody = document.querySelector("#logTable tbody");
+  tbody.innerHTML = "";
+  count = 1;
+  allDurations = [];
+  withBiometric = [];
+  withoutBiometric = [];
+  document.getElementById("timer1").textContent = "00:00";
+  document.getElementById("timer2").textContent = "00:00";
+  updateUnifiedAverage();
+  updatePercentRow();
 }
