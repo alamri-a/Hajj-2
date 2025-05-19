@@ -161,3 +161,24 @@ function clearData() {
   updateUnifiedAverage();
   updatePercentRow();
 }
+
+function undoLastEntry() {
+  const table = document.querySelector("#logTable tbody");
+  const lastRow = table.lastElementChild;
+  if (!lastRow) return;
+
+  const duration = parseInt(lastRow.cells[3]?.textContent.trim());
+  const biometric = lastRow.cells[4]?.textContent.trim();
+
+  if (!isNaN(duration)) {
+    allDurations.pop();
+    if (biometric === "نعم") withBiometric.pop();
+    else if (biometric === "لا") withoutBiometric.pop();
+  }
+
+  table.removeChild(lastRow);
+  count = Math.max(1, count - 1);
+  saveTableData();
+  updateUnifiedAverage();
+  updatePercentRow();
+}
