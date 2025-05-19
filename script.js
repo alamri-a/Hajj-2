@@ -32,11 +32,8 @@ function stopTimer(id) {
     return;
   }
 
-  if (id === 1) {
-    clearInterval(timerInterval1);
-  } else {
-    clearInterval(timerInterval2);
-  }
+  if (id === 1) clearInterval(timerInterval1);
+  else clearInterval(timerInterval2);
 
   const now = new Date();
   const duration = Math.floor((now - (id === 1 ? startTime1 : startTime2)) / 1000);
@@ -111,15 +108,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const tbody = document.querySelector("#logTable tbody");
     tbody.innerHTML = savedRows;
     count = tbody.rows.length + 1;
+
+    // استعادة المصفوفات من الصفوف المحفوظة
+    allDurations = [];
+    withBiometric = [];
+    withoutBiometric = [];
+
     tbody.querySelectorAll("tr").forEach(row => {
-      const val = row.cells[4]?.textContent.trim();
       const duration = parseInt(row.cells[3]?.textContent.trim());
+      const biometric = row.cells[4]?.textContent.trim();
       if (!isNaN(duration)) {
         allDurations.push(duration);
-        if (val === "نعم") withBiometric.push(duration);
-        else if (val === "لا") withoutBiometric.push(duration);
+        if (biometric === "نعم") withBiometric.push(duration);
+        else if (biometric === "لا") withoutBiometric.push(duration);
       }
     });
+
     updateUnifiedAverage();
     updatePercentRow();
   }
