@@ -1,4 +1,3 @@
-
 let startTime1, startTime2;
 let timerInterval1, timerInterval2;
 let count = 1;
@@ -52,7 +51,6 @@ function stopTimer(id) {
   const newRow = table.insertRow();
   newRow.innerHTML = `
     <td>${count++}</td>
-    
     <td>${date}</td>
     <td>${time}</td>
     <td>${duration}</td>
@@ -72,10 +70,13 @@ function updateUnifiedAverage() {
   const avgWith = avg(withBiometric);
   const avgWithout = avg(withoutBiometric);
 
-  document.getElementById("unifiedAverageRow").textContent = `متوسط الزمن العام: ${avgAll} ثانية — له بصمة: ${avgWith} ثانية — ماله بصمة: ${avgWithout} ثانية`;
+  document.getElementById("unifiedAverageRow").textContent =
+    `متوسط الزمن العام: ${avgAll} ثانية — له بصمة: ${avgWith} ثانية — ماله بصمة: ${avgWithout} ثانية`;
+
   const total = withBiometric.length + withoutBiometric.length;
   const percent = v => total ? Math.round((v / total) * 100) : 0;
-  document.getElementById("percentRow").textContent = `نسبة المسجل لهم بصمة: ${percent(withBiometric.length)}% — نسبة غير المسجل لهم: ${percent(withoutBiometric.length)}%`;
+  document.getElementById("percentRow").textContent =
+    `نسبة المسجل لهم بصمة: ${percent(withBiometric.length)}% — نسبة غير المسجل لهم: ${percent(withoutBiometric.length)}%`;
 }
 
 function saveTableAsPDF() {
@@ -93,9 +94,6 @@ function saveTableAsPDF() {
   });
 }
 
-
-
-// Load saved data from localStorage on page load
 document.addEventListener("DOMContentLoaded", function () {
   const savedRows = localStorage.getItem("hajjTableRows");
   if (savedRows) {
@@ -115,12 +113,22 @@ document.addEventListener("DOMContentLoaded", function () {
     updatePercentRow();
   }
 });
-    tbody.appendChild(row);
-    saveTableData();
+
+function saveTableData() {
+  const tbody = document.querySelector("#logTable tbody");
+  localStorage.setItem("hajjTableRows", tbody.innerHTML);
 }
 
-function updateStats() {
-  updatePercentRow();
-}
-
+function updatePercentRow() {
+  const rows = document.querySelectorAll("#logTable tbody tr");
+  let countYes = 0, countNo = 0;
+  rows.forEach(row => {
+    const val = row.cells[4]?.textContent.trim();
+    if (val === "نعم") countYes++;
+    else if (val === "لا") countNo++;
+  });
+  const total = countYes + countNo;
+  const percent = v => total ? Math.round((v / total) * 100) : 0;
+  document.getElementById("percentRow").textContent =
+    `نسبة المسجل لهم بصمة: ${percent(countYes)}% — نسبة غير المسجل لهم: ${percent(countNo)}%`;
 }
