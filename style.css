@@ -70,3 +70,21 @@ input[type="radio"] {
   width: 70%;
   font-size: 16px;
 }
+
+button {
+  font-size: 20px;
+  padding: 12px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button.undo {
+  background-color: #ffc107;
+  color: white;
+}
