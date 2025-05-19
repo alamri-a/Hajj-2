@@ -54,7 +54,7 @@ function updateBiometricStats() {
   const total = withBiometric.length + withoutBiometric.length;
   const percent = v => total ? Math.round((v / total) * 100) : 0;
   document.getElementById("percentStats").textContent =
-    `نسبة المسجل لهم بصمة: ${percent(withBiometric.length)}% — غير المسجلين: ${percent(withoutBiometric.length)}%`;
+    `مسجل لهم بصمه سابقا: ${percent(withBiometric.length)}% | غير مسجل لهم بصمة سابقا: ${percent(withoutBiometric.length)}%`;
 }
 
 function saveToLocalStorage() {
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateAverage();
     updateBiometricStats();
   }
-};
+});
 
 function clearData() {
   if (confirm("هل أنت متأكد أنك تريد مسح كل البيانات؟")) {
@@ -89,7 +89,7 @@ function clearData() {
     document.getElementById("unifiedAverageRow").textContent =
       "متوسط الزمن العام: 0 ثانية — مسجل لهم بصمه: 0 ثانية — غير مسجل لهم: 0 ثانية";
     document.getElementById("percentStats").textContent =
-      "نسبة المسجل لهم بصمة: 0% — غير المسجلين: 0%";
+      "مسجل لهم بصمه سابقا: 0% | غير مسجل لهم بصمة سابقا: 0%";
     count = 1;
     allDurations = [];
     withBiometric = [];
@@ -119,10 +119,10 @@ function saveAsExcel() {
   rows.forEach(row => {
     const cols = row.querySelectorAll("th, td");
     const rowData = Array.from(cols).map(col => `"${col.innerText}"`);
-    csv += rowData.join(",") + "\n";
+    csv += rowData.join(",") + "\\n";
   });
 
-  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob(["\\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
