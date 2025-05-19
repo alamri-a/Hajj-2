@@ -1,0 +1,42 @@
+
+body {
+  font-family: Arial;
+  text-align: center;
+  margin: 30px;
+}
+.section {
+  border: 2px solid #ccc;
+  margin-bottom: 30px;
+  padding: 20px;
+}
+.big-button {
+  font-size: 24px;
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.start-button {
+  background-color: green;
+  color: white;
+}
+.stop-button {
+  background-color: red;
+  color: white;
+}
+.timer {
+  font-size: 24px;
+  margin: 10px;
+}
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+table, th, td {
+  border: 1px solid black;
+}
+th, td {
+  padding: 8px;
+}
