@@ -85,7 +85,35 @@ function updateUnifiedAverage() {
   const percent = v => total ? Math.round((v / total) * 100) : 0;
   document.getElementById("percentRow").textContent =
     `نسبة المسجل لهم بصمة: ${percent(withBiometric.length)}% — نسبة غير المسجل لهم: ${percent(withoutBiometric.length)}%`;
-updateMinMaxRow();
+
+  updateMinMaxRow();
+}
+
+function updatePercentRow() {
+  const rows = document.querySelectorAll("#logTable tbody tr");
+  let countYes = 0, countNo = 0;
+  rows.forEach(row => {
+    const val = row.cells[4]?.textContent.trim();
+    if (val === "نعم") countYes++;
+    else if (val === "لا") countNo++;
+  });
+  const total = countYes + countNo;
+  const percent = v => total ? Math.round((v / total) * 100) : 0;
+  document.getElementById("percentRow").textContent =
+    `نسبة المسجل لهم بصمة: ${percent(countYes)}% — نسبة غير المسجل لهم: ${percent(countNo)}%`;
+}
+
+function updateMinMaxRow() {
+  const min = arr => arr.length ? Math.min(...arr) : 0;
+  const max = arr => arr.length ? Math.max(...arr) : 0;
+
+  const minWith = min(withBiometric);
+  const maxWith = max(withBiometric);
+  const minWithout = min(withoutBiometric);
+  const maxWithout = max(withoutBiometric);
+
+  document.getElementById("minMaxRow").textContent =
+    `الأزمنة القصوى والدنيا — بالبصمة: أقل ${minWith}ث، أعلى ${maxWith}ث — بدون بصمة: أقل ${minWithout}ث، أعلى ${maxWithout}ث`;
 }
 
 function saveTableAsPDF() {
@@ -103,50 +131,9 @@ function saveTableAsPDF() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  const savedRows = localStorage.getItem("hajjTableRows");
-  if (savedRows) {
-    const tbody = document.querySelector("#logTable tbody");
-    tbody.innerHTML = savedRows;
-    count = tbody.rows.length + 1;
-
-    // استعادة المصفوفات من الصفوف المحفوظة
-    allDurations = [];
-    withBiometric = [];
-    withoutBiometric = [];
-
-    tbody.querySelectorAll("tr").forEach(row => {
-      const duration = parseInt(row.cells[3]?.textContent.trim());
-      const biometric = row.cells[4]?.textContent.trim();
-      if (!isNaN(duration)) {
-        allDurations.push(duration);
-        if (biometric === "نعم") withBiometric.push(duration);
-        else if (biometric === "لا") withoutBiometric.push(duration);
-      }
-    });
-
-    updateUnifiedAverage();
-    updatePercentRow();
-  }
-});
-
 function saveTableData() {
   const tbody = document.querySelector("#logTable tbody");
   localStorage.setItem("hajjTableRows", tbody.innerHTML);
-}
-
-function updatePercentRow() {
-  const rows = document.querySelectorAll("#logTable tbody tr");
-  let countYes = 0, countNo = 0;
-  rows.forEach(row => {
-    const val = row.cells[4]?.textContent.trim();
-    if (val === "نعم") countYes++;
-    else if (val === "لا") countNo++;
-  });
-  const total = countYes + countNo;
-  const percent = v => total ? Math.round((v / total) * 100) : 0;
-  document.getElementById("percentRow").textContent =
-    `نسبة المسجل لهم بصمة: ${percent(countYes)}% — نسبة غير المسجل لهم: ${percent(countNo)}%`;
 }
 
 function clearData() {
@@ -161,6 +148,7 @@ function clearData() {
   document.getElementById("timer2").textContent = "00:00";
   updateUnifiedAverage();
   updatePercentRow();
+  updateMinMaxRow();
 }
 
 function undoLastEntry() {
@@ -182,17 +170,32 @@ function undoLastEntry() {
   saveTableData();
   updateUnifiedAverage();
   updatePercentRow();
+  updateMinMaxRow();
 }
 
-function updateMinMaxRow() {
-  const min = arr => arr.length ? Math.min(...arr) : 0;
-  const max = arr => arr.length ? Math.max(...arr) : 0;
+document.addEventListener("DOMContentLoaded", function () {
+  const savedRows = localStorage.getItem("hajjTableRows");
+  if (savedRows) {
+    const tbody = document.querySelector("#logTable tbody");
+    tbody.innerHTML = savedRows;
+    count = tbody.rows.length + 1;
 
-  const minWith = min(withBiometric);
-  const maxWith = max(withBiometric);
-  const minWithout = min(withoutBiometric);
-  const maxWithout = max(withoutBiometric);
+    allDurations = [];
+    withBiometric = [];
+    withoutBiometric = [];
 
-  document.getElementById("minMaxRow").textContent =
-    `الأزمنة القصوى والدنيا — بالبصمة: أقل ${minWith}ث، أعلى ${maxWith}ث — بدون بصمة: أقل ${minWithout}ث، أعلى ${maxWithout}ث`;
-}
+    tbody.querySelectorAll("tr").forEach(row => {
+      const duration = parseInt(row.cells[3]?.textContent.trim());
+      const biometric = row.cells[4]?.textContent.trim();
+      if (!isNaN(duration)) {
+        allDurations.push(duration);
+        if (biometric === "نعم") withBiometric.push(duration);
+        else if (biometric === "لا") withoutBiometric.push(duration);
+      }
+    });
+
+    updateUnifiedAverage();
+    updatePercentRow();
+    updateMinMaxRow();
+  }
+});
