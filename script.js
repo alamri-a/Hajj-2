@@ -85,6 +85,7 @@ function updateUnifiedAverage() {
   const percent = v => total ? Math.round((v / total) * 100) : 0;
   document.getElementById("percentRow").textContent =
     `نسبة المسجل لهم بصمة: ${percent(withBiometric.length)}% — نسبة غير المسجل لهم: ${percent(withoutBiometric.length)}%`;
+updateMinMaxRow();
 }
 
 function saveTableAsPDF() {
@@ -181,4 +182,17 @@ function undoLastEntry() {
   saveTableData();
   updateUnifiedAverage();
   updatePercentRow();
+}
+
+function updateMinMaxRow() {
+  const min = arr => arr.length ? Math.min(...arr) : 0;
+  const max = arr => arr.length ? Math.max(...arr) : 0;
+
+  const minWith = min(withBiometric);
+  const maxWith = max(withBiometric);
+  const minWithout = min(withoutBiometric);
+  const maxWithout = max(withoutBiometric);
+
+  document.getElementById("minMaxRow").textContent =
+    `الأزمنة القصوى والدنيا — بالبصمة: أقل ${minWith}ث، أعلى ${maxWith}ث — بدون بصمة: أقل ${minWithout}ث، أعلى ${maxWithout}ث`;
 }
