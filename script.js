@@ -120,15 +120,32 @@ function updateMinMaxRow() {
 
 function saveTableAsPDF() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const table = document.getElementById("logTable");
 
-  html2canvas(document.querySelector("#logTable")).then(canvas => {
+  html2canvas(table, {
+    scale: 2,
+    useCORS: true
+  }).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     const imgProps = doc.getImageProperties(imgData);
-    const pdfWidth = doc.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    const imgHeight = (imgProps.height * pageWidth) / imgProps.width;
+    let position = 0;
 
-    doc.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight);
+    if (imgHeight < pageHeight) {
+      doc.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+    } else {
+      let heightLeft = imgHeight;
+      while (heightLeft > 0) {
+        doc.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
+        heightLeft -= pageHeight;
+        position -= pageHeight;
+        if (heightLeft > 0) doc.addPage();
+      }
+    }
+
     doc.save("سجل_الحجاج.pdf");
   });
 }
