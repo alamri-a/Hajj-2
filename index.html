@@ -50,12 +50,23 @@
 
 <h2 style="text-align: right; margin-top: 40px;">
   سجل الحجاج
-  <button onclick="saveTableAsPDF()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px; vertical-align: middle;">
+
+  <!-- أزرار الحفظ -->
+  <button onclick="saveTableAsPDF()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px;">
     💾 حفظ PDF
   </button>
-  <button onclick="saveTableAsExcel()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px; vertical-align: middle;">
-  📥 حفظ Excel
-</button>
+  <button onclick="saveTableAsExcel()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px;">
+    📥 حفظ Excel
+  </button>
+
+  <!-- فاصل مرئي بين الحفظ والحذف -->
+  <span style="display: inline-block; width: 40px;"></span>
+
+  <!-- خانة حذف الصف -->
+  <input type="number" id="rowToDelete" placeholder="رقم الصف" style="font-size: 16px; width: 100px; margin-right: 5px;">
+  <button onclick="deleteRowByNumber()" style="font-size: 16px; padding: 5px 10px;">
+    🗑️ حذف صف
+  </button>
 </h2>
 
 <table id="logTable">
