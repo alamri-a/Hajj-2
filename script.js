@@ -131,6 +131,26 @@ function saveTableAsPDF() {
   });
 }
 
+function saveTableAsExcel() {
+  const table = document.querySelector("#logTable");
+  let csv = "";
+
+  const rows = table.querySelectorAll("tr");
+  rows.forEach(row => {
+    const cols = row.querySelectorAll("th, td");
+    const rowData = Array.from(cols).map(col => `"${col.textContent.trim()}"`);
+    csv += rowData.join(",") + "\n";
+  });
+
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "سجل_الحجاج.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function saveTableData() {
   const tbody = document.querySelector("#logTable tbody");
   localStorage.setItem("hajjTableRows", tbody.innerHTML);
