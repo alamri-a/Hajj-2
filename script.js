@@ -221,3 +221,38 @@ document.addEventListener("DOMContentLoaded", function () {
     updateMinMaxRow();
   }
 });
+
+function deleteRowByNumber() {
+  const rowNum = parseInt(document.getElementById("rowToDelete").value);
+  if (!rowNum || rowNum < 1) {
+    alert("يرجى إدخال رقم صف صالح.");
+    return;
+  }
+
+  const tbody = document.querySelector("#logTable tbody");
+  const rows = Array.from(tbody.rows);
+  const rowIndex = rows.findIndex(row => parseInt(row.cells[0].textContent) === rowNum);
+
+  if (rowIndex === -1) {
+    alert("لم يتم العثور على الصف بهذا الرقم.");
+    return;
+  }
+
+  const confirmDelete = confirm(`هل أنت متأكد من حذف الصف رقم ${rowNum}؟`);
+  if (!confirmDelete) return;
+
+  // تحديث البيانات
+  const row = rows[rowIndex];
+  const duration = parseInt(row.cells[3].textContent.trim());
+  const biometric = row.cells[4].textContent.trim();
+
+  allDurations = allDurations.filter(d => d !== duration);
+  if (biometric === "نعم") withBiometric = withBiometric.filter(d => d !== duration);
+  else withoutBiometric = withoutBiometric.filter(d => d !== duration);
+
+  tbody.deleteRow(rowIndex);
+  saveTableData();
+  updateUnifiedAverage();
+  updatePercentRow();
+  updateMinMaxRow();
+}
