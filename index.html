@@ -7,10 +7,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- إضافة مكتبة html2pdf -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
+
 <div style="text-align: center; margin-top: 20px;">
   <button class="reset" onclick="clearData()">
     <span class="icon">♻️</span> البدء من جديد
@@ -25,13 +25,11 @@
   <button class="big-button start-button" onclick="startTimer(1)">▶ بدء</button>
   <button class="big-button stop-button" onclick="stopTimer(1)">■ إنهاء</button>
   <div class="timer" id="timer1">00:00</div>
-
   <div class="input-section">
     <label>هل الحاج مسجل له بصمة سابقًا؟</label>
     <input type="radio" name="fingerprint1" value="نعم" checked> نعم
     <input type="radio" name="fingerprint1" value="لا"> لا
   </div>
-
   <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
 </div>
 
@@ -40,35 +38,25 @@
   <button class="big-button start-button" onclick="startTimer(2)">▶ بدء</button>
   <button class="big-button stop-button" onclick="stopTimer(2)">■ إنهاء</button>
   <div class="timer" id="timer2">00:00</div>
-
   <div class="input-section">
     <label>هل الحاج مسجل له بصمة سابقًا؟</label>
     <input type="radio" name="fingerprint2" value="نعم" checked> نعم
     <input type="radio" name="fingerprint2" value="لا"> لا
   </div>
-
   <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
 </div>
 
 <h2 style="text-align: right; margin-top: 40px;">
   سجل الحجاج
-
-  <!-- أزرار الحفظ -->
   <button onclick="saveTableAsPDF()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px;">
     💾 حفظ PDF
   </button>
   <button onclick="saveTableAsExcel()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px;">
     📥 حفظ Excel
   </button>
-
-  <!-- فاصل مرئي بين الحفظ والحذف -->
   <span style="display: inline-block; width: 40px;"></span>
-
-  <!-- خانة حذف الصف -->
   <input type="number" id="rowToDelete" placeholder="رقم الصف" style="font-size: 16px; width: 100px; margin-right: 5px;">
-  <button onclick="deleteRowByNumber()" style="font-size: 16px; padding: 5px 10px;">
-    🗑️ حذف صف
-  </button>
+  <button onclick="deleteRowByNumber()" style="font-size: 16px; padding: 5px 10px;">🗑️ حذف صف</button>
 </h2>
 
 <table id="logTable">
@@ -84,20 +72,37 @@
   </thead>
   <tbody></tbody>
   <tfoot>
-    <tr style="background-color: #eee; font-weight: bold;">
-      <td colspan="7" id="unifiedAverageRow">
-        متوسط الزمن العام: 0 ثانية — له بصمة: 0 ثانية — ماله بصمة: 0 ثانية
-      </td>
+    <tr style="background-color: #ddd; font-weight: bold;">
+      <th>الفئة</th>
+      <th colspan="1">عدد الحجاج</th>
+      <th colspan="1">متوسط الزمن (ثانية)</th>
+      <th colspan="1">الزمن الأدنى (ثانية)</th>
+      <th colspan="1">الزمن الأعلى (ثانية)</th>
+      <th colspan="1">النسبة من الإجمالي</th>
     </tr>
-    <tr>
-      <td colspan="7" id="percentRow" style="background:#eee; text-align:center;">
-        نسبة المسجل لهم بصمة: 0% — نسبة غير المسجل لهم: 0%
-      </td>
+    <tr id="stats-biometric">
+      <td>المسجل لهم بصمة</td>
+      <td id="countWith">0</td>
+      <td id="avgWith">0</td>
+      <td id="minWith">0</td>
+      <td id="maxWith">0</td>
+      <td id="percentWith">0%</td>
     </tr>
-    <tr>
-      <td colspan="7" id="minMaxRow" style="background:#eee; text-align:center;">
-        الأزمنة القصوى والدنيا — بالبصمة: أقل 0ث، أعلى 0ث — بدون بصمة: أقل 0ث، أعلى 0ث
-      </td>
+    <tr id="stats-nonbiometric">
+      <td>غير المسجل لهم بصمة</td>
+      <td id="countWithout">0</td>
+      <td id="avgWithout">0</td>
+      <td id="minWithout">0</td>
+      <td id="maxWithout">0</td>
+      <td id="percentWithout">0%</td>
+    </tr>
+    <tr id="stats-total">
+      <td>الإجمالي</td>
+      <td id="countTotal">0</td>
+      <td id="avgTotal">0</td>
+      <td id="minTotal">0</td>
+      <td id="maxTotal">0</td>
+      <td>—</td>
     </tr>
   </tfoot>
 </table>
