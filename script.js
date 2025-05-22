@@ -49,8 +49,8 @@ function stopTimer(id) {
 
   updateUnifiedAverage();
 
-  const date = now.toLocaleDateString('ar-EG');
-  const time = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+  const date = now.toLocaleDateString('en-GB');
+  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
   const table = document.getElementById("logTable").querySelector("tbody");
   const newRow = table.insertRow();
@@ -69,7 +69,9 @@ function stopTimer(id) {
   else startTime2 = null;
 
   saveTableData();
+  updateUnifiedAverage();
   updatePercentRow();
+  updateMinMaxRow();
 }
 
 function updateUnifiedAverage() {
