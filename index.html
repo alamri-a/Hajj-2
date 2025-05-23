@@ -32,8 +32,11 @@
     <input type="radio" name="fingerprint1" value="لا"> لا
   </div>
 
-  <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
-  <div class="delay-extra">
+  <div class="input-section">
+    <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
+  </div>
+
+  <div class="input-section delay-extra">
     <label>
       <input type="radio" name="delayOption1" value="صعوبة قراءة البصمة">
       صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
@@ -57,8 +60,11 @@
     <input type="radio" name="fingerprint2" value="لا"> لا
   </div>
 
-  <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
-  <div class="delay-extra">
+  <div class="input-section">
+    <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
+  </div>
+
+  <div class="input-section delay-extra">
     <label>
       <input type="radio" name="delayOption2" value="صعوبة قراءة البصمة">
       صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
@@ -98,11 +104,11 @@
   <tfoot>
     <tr style="background-color: #ddd; font-weight: bold;">
       <th>الفئة</th>
-      <th>عدد الحجاج</th>
-      <th>متوسط الزمن (ث)</th>
-      <th>الأدنى</th>
-      <th>الأعلى</th>
-      <th>النسبة</th>
+      <th colspan="1">عدد الحجاج</th>
+      <th colspan="1">متوسط الزمن (ثانية)</th>
+      <th colspan="1">الزمن الأدنى (ثانية)</th>
+      <th colspan="1">الزمن الأعلى (ثانية)</th>
+      <th colspan="1">النسبة من الإجمالي</th>
     </tr>
     <tr id="stats-biometric">
       <td>المسجل لهم بصمة</td>
