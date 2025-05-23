@@ -34,7 +34,21 @@ function stopTimer(id) {
   const now = new Date();
   const duration = Math.floor((now - (id === 1 ? startTime1 : startTime2)) / 1000);
   const fingerprint = document.querySelector(`input[name="fingerprint${id}"]:checked`).value;
-  const delayReason = document.getElementById(`delayReason${id}`).value;
+
+  const delayText = document.getElementById(`delayReason${id}`).value.trim();
+  const selectedRadio = document.querySelector(`input[name="delayOption${id}"]:checked`);
+  const delayOption = selectedRadio ? selectedRadio.value : "";
+  let finalReason = "";
+
+  if (delayOption && delayText) {
+    finalReason = `${delayOption} - تأخير يدوي: ${delayText}`;
+  } else if (delayOption) {
+    finalReason = delayOption;
+  } else if (delayText) {
+    finalReason = delayText;
+  } else {
+    finalReason = "";
+  }
 
   allDurations.push(duration);
   if (fingerprint === "نعم") withBiometric.push(duration);
@@ -50,11 +64,13 @@ function stopTimer(id) {
     <td>${time}</td>
     <td>${duration}</td>
     <td>${fingerprint}</td>
-    <td>${delayReason}</td>
+    <td>${finalReason}</td>
   `;
 
   document.getElementById(`timer${id}`).textContent = "00:00";
   document.getElementById(`delayReason${id}`).value = "";
+  if (selectedRadio) selectedRadio.checked = false;
+
   if (id === 1) startTime1 = null;
   else startTime2 = null;
 
