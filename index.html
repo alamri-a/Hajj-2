@@ -25,23 +25,24 @@
   <button class="big-button start-button" onclick="startTimer(1)">▶ بدء</button>
   <button class="big-button stop-button" onclick="stopTimer(1)">■ إنهاء</button>
   <div class="timer" id="timer1">00:00</div>
+
   <div class="input-section">
     <label>هل الحاج مسجل له بصمة سابقًا؟</label>
     <input type="radio" name="fingerprint1" value="نعم" checked> نعم
     <input type="radio" name="fingerprint1" value="لا"> لا
   </div>
-  <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
-<input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
 
-<div class="delay-extra">
-  <label>
-    <input type="radio" name="delayOption1" value="صعوبة قراءة البصمة">
-    صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
-  </label><br>
-  <label>
-    <input type="radio" name="delayOption1" value="التحقق من القوائم الأمنية">
-    التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
-  </label>
+  <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
+  <div class="delay-extra">
+    <label>
+      <input type="radio" name="delayOption1" value="صعوبة قراءة البصمة">
+      صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
+    </label><br>
+    <label>
+      <input type="radio" name="delayOption1" value="التحقق من القوائم الأمنية">
+      التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
+    </label>
+  </div>
 </div>
 
 <h2>قياس زمن إنهاء إجراءات الحاج - 2</h2>
@@ -49,23 +50,24 @@
   <button class="big-button start-button" onclick="startTimer(2)">▶ بدء</button>
   <button class="big-button stop-button" onclick="stopTimer(2)">■ إنهاء</button>
   <div class="timer" id="timer2">00:00</div>
+
   <div class="input-section">
     <label>هل الحاج مسجل له بصمة سابقًا؟</label>
     <input type="radio" name="fingerprint2" value="نعم" checked> نعم
     <input type="radio" name="fingerprint2" value="لا"> لا
   </div>
-  <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
-<input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
 
-<div class="delay-extra">
-  <label>
-    <input type="radio" name="delayOption1" value="صعوبة قراءة البصمة">
-    صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
-  </label><br>
-  <label>
-    <input type="radio" name="delayOption1" value="التحقق من القوائم الأمنية">
-    التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
-  </label>
+  <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
+  <div class="delay-extra">
+    <label>
+      <input type="radio" name="delayOption2" value="صعوبة قراءة البصمة">
+      صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
+    </label><br>
+    <label>
+      <input type="radio" name="delayOption2" value="التحقق من القوائم الأمنية">
+      التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
+    </label>
+  </div>
 </div>
 
 <h2 style="text-align: right; margin-top: 40px;">
@@ -96,11 +98,11 @@
   <tfoot>
     <tr style="background-color: #ddd; font-weight: bold;">
       <th>الفئة</th>
-      <th colspan="1">عدد الحجاج</th>
-      <th colspan="1">متوسط الزمن (ثانية)</th>
-      <th colspan="1">الزمن الأدنى (ثانية)</th>
-      <th colspan="1">الزمن الأعلى (ثانية)</th>
-      <th colspan="1">النسبة من الإجمالي</th>
+      <th>عدد الحجاج</th>
+      <th>متوسط الزمن (ث)</th>
+      <th>الأدنى</th>
+      <th>الأعلى</th>
+      <th>النسبة</th>
     </tr>
     <tr id="stats-biometric">
       <td>المسجل لهم بصمة</td>
