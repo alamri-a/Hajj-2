@@ -100,7 +100,7 @@ button.undo {
   color: white;
 }
 
-/* تنسيق خيارات سبب التأخير الإضافية */
+/* تنسيق الخيارات الإضافية لسبب التأخير */
 .delay-extra {
   margin-top: 10px;
   text-align: center;
@@ -108,18 +108,18 @@ button.undo {
 
 .delay-extra label {
   display: block;
-  margin: 3px 0;
+  margin: 6px 0;
   font-size: 18px;
 }
 
 .delay-extra input[type="radio"] {
+  margin-left: 10px;
   transform: scale(1.3);
-  margin-left: 8px;
   vertical-align: middle;
 }
 
 .optional-note {
-  font-size: 13px;
-  color: #888888;
-  margin-right: 4px;
+  color: #888;
+  font-size: 14px;
+  margin-right: 5px;
 }
