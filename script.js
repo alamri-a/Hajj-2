@@ -36,18 +36,16 @@ function stopTimer(id) {
   const fingerprint = document.querySelector(`input[name="fingerprint${id}"]:checked`).value;
 
   const delayText = document.getElementById(`delayReason${id}`).value.trim();
-  const selectedRadio = document.querySelector(`input[name="delayOption${id}"]:checked`);
-  const delayOption = selectedRadio ? selectedRadio.value : "";
-  let finalReason = "";
+  const selectedExtra = document.querySelector(`input[name="delayOption${id}"]:checked`);
+  const extraReason = selectedExtra ? selectedExtra.value : "";
 
-  if (delayOption && delayText) {
-    finalReason = `${delayOption} - تأخير يدوي: ${delayText}`;
-  } else if (delayOption) {
-    finalReason = delayOption;
+  let finalReason = "";
+  if (delayText && extraReason) {
+    finalReason = `${extraReason} - ${delayText}`;
   } else if (delayText) {
     finalReason = delayText;
-  } else {
-    finalReason = "";
+  } else if (extraReason) {
+    finalReason = extraReason;
   }
 
   allDurations.push(duration);
@@ -69,7 +67,7 @@ function stopTimer(id) {
 
   document.getElementById(`timer${id}`).textContent = "00:00";
   document.getElementById(`delayReason${id}`).value = "";
-  if (selectedRadio) selectedRadio.checked = false;
+  if (selectedExtra) selectedExtra.checked = false;
 
   if (id === 1) startTime1 = null;
   else startTime2 = null;
