@@ -155,6 +155,7 @@ function undoLastEntry() {
   }
   tbody.removeChild(lastRow);
   count = Math.max(1, count - 1);
+  updateRowNumbers(); // تحديث عمود التعداد
   saveTableData();
   updateFooterStats();
 }
@@ -178,6 +179,7 @@ function deleteRowByNumber() {
   else withoutBiometric = withoutBiometric.filter(d => d !== duration);
 
   tbody.deleteRow(rowIndex);
+  updateRowNumbers(); // تحديث عمود التعداد
   saveTableData();
   updateFooterStats();
 }
@@ -205,3 +207,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateFooterStats();
   }
 });
+
+function updateRowNumbers() {
+  const rows = document.querySelectorAll("#logTable tbody tr");
+  rows.forEach((row, index) => {
+    row.cells[0].textContent = index + 1;
+  });
+}
