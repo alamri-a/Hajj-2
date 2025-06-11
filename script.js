@@ -1,6 +1,5 @@
 let startTime1, startTime2;
 let timerInterval1, timerInterval2;
-let count = 1;
 let allDurations = [], withBiometric = [], withoutBiometric = [];
 
 function startTimer(id) {
@@ -55,9 +54,10 @@ function stopTimer(id) {
   const date = now.toLocaleDateString('en-GB');
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
-  const row = document.getElementById("logTable").querySelector("tbody").insertRow();
+  const tbody = document.querySelector("#logTable tbody");
+  const row = tbody.insertRow();
   row.innerHTML = `
-    <td>${document.querySelector("#logTable tbody").rows.length + 1}</td>
+    <td>${tbody.rows.length}</td>
     <td>${date}</td>
     <td>${time}</td>
     <td>${duration}</td>
@@ -112,12 +112,10 @@ function saveTableAsExcel() {
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.table_to_sheet(table, { raw: true });
 
-  // ضبط اتجاه الورقة RTL
   worksheet["!cols"] = [];
   worksheet["A1"].s = { alignment: { readingOrder: 2 } };
 
   XLSX.utils.book_append_sheet(workbook, worksheet, "سجل الحجاج");
-
   XLSX.writeFile(workbook, "سجل_الحجاج.xlsx", { bookType: "xlsx", type: "binary", compression: true });
 }
 
@@ -133,7 +131,6 @@ function clearData() {
   localStorage.removeItem("hajjTableRows");
   const tbody = document.querySelector("#logTable tbody");
   tbody.innerHTML = "";
-  count = 1;
   allDurations = [];
   withBiometric = [];
   withoutBiometric = [];
@@ -146,16 +143,18 @@ function undoLastEntry() {
   const tbody = document.querySelector("#logTable tbody");
   const lastRow = tbody.lastElementChild;
   if (!lastRow) return;
+
   const duration = parseInt(lastRow.cells[3]?.textContent.trim());
   const biometric = lastRow.cells[4]?.textContent.trim();
+
   if (!isNaN(duration)) {
     allDurations.pop();
     if (biometric === "نعم") withBiometric.pop();
     else withoutBiometric.pop();
   }
+
   tbody.removeChild(lastRow);
-  count = Math.max(1, count - 1);
-  updateRowNumbers(); // تحديث عمود التعداد
+  updateRowNumbers();
   saveTableData();
   updateFooterStats();
 }
@@ -179,7 +178,7 @@ function deleteRowByNumber() {
   else withoutBiometric = withoutBiometric.filter(d => d !== duration);
 
   tbody.deleteRow(rowIndex);
-  updateRowNumbers(); // تحديث عمود التعداد
+  updateRowNumbers();
   saveTableData();
   updateFooterStats();
 }
@@ -189,7 +188,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (savedRows) {
     const tbody = document.querySelector("#logTable tbody");
     tbody.innerHTML = savedRows;
-    count = tbody.rows.length + 1;
 
     allDurations = [];
     withBiometric = [];
@@ -204,7 +202,9 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (biometric === "لا") withoutBiometric.push(duration);
       }
     });
+
     updateFooterStats();
+    updateRowNumbers();
   }
 });
 
