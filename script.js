@@ -109,18 +109,16 @@ function updateFooterStats() {
 
 function saveTableAsExcel() {
   const table = document.querySelector("#logTable");
-  let csv = "";
-  table.querySelectorAll("tr").forEach(row => {
-    const cols = row.querySelectorAll("th, td");
-    csv += Array.from(cols).map(col => `"${col.textContent.trim()}"`).join(",") + "\n";
-  });
-  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "سجل_الحجاج.csv";
-  a.click();
-  URL.revokeObjectURL(url);
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.table_to_sheet(table, { raw: true });
+
+  // ضبط اتجاه الورقة RTL
+  worksheet["!cols"] = [];
+  worksheet["A1"].s = { alignment: { readingOrder: 2 } };
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, "سجل الحجاج");
+
+  XLSX.writeFile(workbook, "سجل_الحجاج.xlsx", { bookType: "xlsx", type: "binary", compression: true });
 }
 
 function saveTableData() {
