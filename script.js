@@ -57,7 +57,7 @@ function stopTimer(id) {
 
   const row = document.getElementById("logTable").querySelector("tbody").insertRow();
   row.innerHTML = `
-    <td>${count++}</td>
+    <td>${document.querySelector("#logTable tbody").rows.length + 1}</td>
     <td>${date}</td>
     <td>${time}</td>
     <td>${duration}</td>
