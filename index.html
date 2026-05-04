@@ -8,6 +8,43 @@
 </head>
 <body>
 
+<!-- ===== Modal اختيار المنفذ والمرحلة ===== -->
+<div id="setupModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>اختر المنفذ / الموقع</h3>
+
+    <select id="checkpointSelect">
+      <option value="">-- اختر منفذاً --</option>
+      <option value="منفذ الوديعة">منفذ الوديعة</option>
+      <option value="مطار الملك عبدالعزيز">مطار الملك عبدالعزيز</option>
+      <option value="مطار المدينة المنورة">مطار المدينة المنورة</option>
+      <option value="حالة عمار">حالة عمار</option>
+    </select>
+
+    <div class="modal-custom">
+      <label>أو أدخل اسم منفذ مخصص:</label>
+      <input type="text" id="checkpointCustom" placeholder="اسم المنفذ...">
+    </div>
+
+    <div class="modal-phase">
+      <label>اختر المرحلة:</label><br>
+      <label><input type="radio" name="phaseSelect" value="القدوم" checked> القدوم</label>
+      <label><input type="radio" name="phaseSelect" value="المغادرة"> المغادرة</label>
+    </div>
+
+    <button class="modal-confirm" onclick="saveSetupChoice()">✔ تأكيد وبدء</button>
+  </div>
+</div>
+
+<!-- ===== شريط الحالة ===== -->
+<div id="statusBar" class="status-bar" style="display:none">
+  <span>المنفذ: <strong id="statusCheckpoint">-</strong></span>
+  <span class="status-sep">|</span>
+  <span>المرحلة: <strong id="statusPhase">-</strong></span>
+  <button class="change-btn" onclick="showSetupModal()">⚙ تغيير</button>
+</div>
+
+<!-- ===== أزرار التحكم العامة ===== -->
 <div style="text-align: center; margin-top: 20px;">
   <button class="reset" onclick="clearData()">
     <span class="icon">♻️</span> البدء من جديد
@@ -17,6 +54,7 @@
   </button>
 </div>
 
+<!-- ===== التايمر الأول ===== -->
 <h2>قياس زمن إنهاء إجراءات الحاج - 1</h2>
 <div class="section">
   <button class="big-button start-button" onclick="startTimer(1)">▶ بدء</button>
@@ -45,37 +83,48 @@
   </div>
 </div>
 
-<h2>قياس زمن إنهاء إجراءات الحاج - 2</h2>
-<div class="section">
-  <button class="big-button start-button" onclick="startTimer(2)">▶ بدء</button>
-  <button class="big-button stop-button" onclick="stopTimer(2)">■ إنهاء</button>
-  <div class="timer" id="timer2">00:00</div>
+<!-- ===== زر إظهار/إخفاء التايمر الثاني ===== -->
+<div style="text-align: center; margin-top: 15px;">
+  <button id="toggleTimer2Btn" class="toggle-timer2" onclick="toggleTimer2()">
+    ＋ إظهار التايمر الثاني
+  </button>
+</div>
 
-  <div class="input-section">
-    <label>هل الحاج مسجل له بصمة سابقًا؟</label>
-    <input type="radio" name="fingerprint2" value="نعم" checked> نعم
-    <input type="radio" name="fingerprint2" value="لا"> لا
-  </div>
+<!-- ===== التايمر الثاني (مخفي بالافتراضي) ===== -->
+<div id="timer2Section" style="display:none">
+  <h2>قياس زمن إنهاء إجراءات الحاج - 2</h2>
+  <div class="section">
+    <button class="big-button start-button" onclick="startTimer(2)">▶ بدء</button>
+    <button class="big-button stop-button" onclick="stopTimer(2)">■ إنهاء</button>
+    <div class="timer" id="timer2">00:00</div>
 
-  <div class="input-section">
-    <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
-  </div>
+    <div class="input-section">
+      <label>هل الحاج مسجل له بصمة سابقًا؟</label>
+      <input type="radio" name="fingerprint2" value="نعم" checked> نعم
+      <input type="radio" name="fingerprint2" value="لا"> لا
+    </div>
 
-  <div class="input-section delay-extra">
-    <label>
-      <input type="radio" name="delayOption2" value="صعوبة قراءة البصمة">
-      صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
-    </label><br>
-    <label>
-      <input type="radio" name="delayOption2" value="التحقق من القوائم الأمنية">
-      التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
-    </label>
+    <div class="input-section">
+      <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
+    </div>
+
+    <div class="input-section delay-extra">
+      <label>
+        <input type="radio" name="delayOption2" value="صعوبة قراءة البصمة">
+        صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
+      </label><br>
+      <label>
+        <input type="radio" name="delayOption2" value="التحقق من القوائم الأمنية">
+        التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
+      </label>
+    </div>
   </div>
 </div>
 
+<!-- ===== جدول السجل ===== -->
 <h2 style="text-align: right; margin-top: 40px;">
   سجل الحجاج
-  
+
   <button onclick="saveTableAsExcel()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px;">
     📥 حفظ Excel
   </button>
