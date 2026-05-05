@@ -4,7 +4,7 @@
 // =====================================================
 
 const SPREADSHEET_NAME = "Hajj-2 Data";
-const STATS_MARKER = "STATS_SECTION"; // علامة داخلية تُميّز صفوف الإحصائيات
+const STATS_MARKER = "STATS_SECTION";
 const HEADERS = [
   "recordId", "التعداد", "التاريخ", "الساعة",
   "المدة بالثواني", "مسجل له بصمة سابقًا؟", "سبب التأخير", "المرحلة"
@@ -23,20 +23,23 @@ function doGet(e) {
     const sheetName = sanitizeSheetName(checkpoint);
     const sheet = ss.getSheetByName(sheetName);
 
-    if (!sheet) {
-      return jsonResponse({ status: "ok", records: [] });
-    }
+    if (!sheet) return jsonResponse({ status: "ok", records: [] });
 
     const sheetData = sheet.getDataRange().getValues();
-    if (sheetData.length <= 1) {
-      return jsonResponse({ status: "ok", records: [] });
-    }
+    if (sheetData.length <= 1) return jsonResponse({ status: "ok", records: [] });
 
     const headers = sheetData[0];
+    const tz = Session.getScriptTimeZone();
+
+    // تحويل Date objects إلى نصوص منسقة
+    const fmtDate = v => v instanceof Date
+      ? Utilities.formatDate(v, tz, "dd/MM/yyyy") : String(v);
+    const fmtTime = v => v instanceof Date
+      ? Utilities.formatDate(v, tz, "hh:mm a") : String(v);
+
     const records = [];
 
     for (let i = 1; i < sheetData.length; i++) {
-      // تخطّ صفوف الإحصائيات
       if ((sheetData[i][8] || "") === STATS_MARKER) continue;
 
       const row = sheetData[i];
@@ -47,8 +50,8 @@ function doGet(e) {
         records.push({
           recordId:    String(record["recordId"]),
           counter:     record["التعداد"],
-          date:        record["التاريخ"],
-          time:        record["الساعة"],
+          date:        fmtDate(record["التاريخ"]),
+          time:        fmtTime(record["الساعة"]),
           duration:    Number(record["المدة بالثواني"]),
           biometric:   record["مسجل له بصمة سابقًا؟"],
           delayReason: record["سبب التأخير"],
@@ -86,17 +89,25 @@ function doPost(e) {
       const sheet  = getOrCreateSheet(ss, sheetName);
       const record = payload.record;
 
-      // أدرج الصف قبل قسم الإحصائيات إن وجد، وإلا أضفه في النهاية
+      // احسب التعداد من الـ Sheet مباشرةً (مستقل عن كل الأجهزة)
+      const existingData = sheet.getDataRange().getValues();
+      const dataCount = existingData.slice(1).filter(r =>
+        (r[8] || "") !== STATS_MARKER && String(r[0]).trim() !== ""
+      ).length;
+      const counter = dataCount + 1;
+
       const statsStart = findStatsStartRow(sheet);
       if (statsStart === -1) {
         sheet.appendRow([
-          record.recordId, record.counter, record.date, record.time,
+          record.recordId, counter, record.date, record.time,
           record.duration, record.biometric, record.delayReason, phase
         ]);
       } else {
         sheet.insertRowBefore(statsStart);
+        // إزالة أي تنسيق موروث من صف الإحصائيات
+        sheet.getRange(statsStart, 1, 1, 9).clearFormat();
         sheet.getRange(statsStart, 1, 1, 8).setValues([[
-          record.recordId, record.counter, record.date, record.time,
+          record.recordId, counter, record.date, record.time,
           record.duration, record.biometric, record.delayReason, phase
         ]]);
       }
@@ -126,9 +137,7 @@ function doPost(e) {
       const sheetData = sheet.getDataRange().getValues();
       for (let i = sheetData.length; i >= 2; i--) {
         if ((sheetData[i - 1][8] || "") === STATS_MARKER) continue;
-        if (sheetData[i - 1][7] === phase) {
-          sheet.deleteRow(i);
-        }
+        if (sheetData[i - 1][7] === phase) sheet.deleteRow(i);
       }
 
       refreshStats(sheet);
@@ -149,34 +158,38 @@ function doPost(e) {
 // ══════════════════════════════════════════
 
 function refreshStats(sheet) {
-  const allData = sheet.getDataRange().getValues();
-
-  // إيجاد آخر صف بيانات حقيقي (تخطّ صفوف الإحصائيات)
-  let lastDataRow = 1;
-  for (let i = 1; i < allData.length; i++) {
-    if ((allData[i][8] || "") === STATS_MARKER) continue;
-    if (String(allData[i][0]).trim() !== "") {
-      lastDataRow = i + 1; // 1-indexed
+  // 1. تنظيف الصفوف الفارغة المتداخلة مع البيانات (إصلاح خلل قديم)
+  for (let i = sheet.getLastRow(); i >= 2; i--) {
+    const r = sheet.getRange(i, 1, 1, 9).getValues()[0];
+    if ((r[8] || "") !== STATS_MARKER && r.slice(0, 8).every(c => String(c).trim() === "")) {
+      sheet.deleteRow(i);
     }
   }
 
-  // مسح كل شيء بعد آخر صف بيانات
+  const allData = sheet.getDataRange().getValues();
+
+  // 2. إيجاد آخر صف بيانات حقيقي
+  let lastDataRow = 1;
+  for (let i = 1; i < allData.length; i++) {
+    if ((allData[i][8] || "") === STATS_MARKER) continue;
+    if (String(allData[i][0]).trim() !== "") lastDataRow = i + 1;
+  }
+
+  // 3. مسح كل شيء بعد آخر صف بيانات
   const sheetLastRow = sheet.getLastRow();
   if (sheetLastRow > lastDataRow) {
     sheet.getRange(lastDataRow + 1, 1, sheetLastRow - lastDataRow, 9).clear();
   }
 
-  // جمع صفوف البيانات الفعلية
+  // 4. جمع صفوف البيانات الفعلية
   const dataRows = allData.slice(1).filter(row =>
     (row[8] || "") !== STATS_MARKER && String(row[0]).trim() !== ""
   );
 
   if (dataRows.length === 0) return;
 
-  // المراحل الموجودة في البيانات
   const phases = [...new Set(dataRows.map(r => r[7]).filter(Boolean))];
-
-  let writeRow = lastDataRow + 2;
+  let writeRow = lastDataRow + 1; // بدون فراغ قبل الإحصائيات
 
   for (const phase of phases) {
     const phaseRows  = dataRows.filter(r => r[7] === phase);
@@ -190,8 +203,8 @@ function refreshStats(sheet) {
     const pct     = (n, tot) => tot ? Math.round(n / tot * 100) + "%" : "0%";
     const total   = allDur.length;
 
-    // عنوان المرحلة
-    sheet.getRange(writeRow, 1, 1, 8).merge()
+    // عنوان المرحلة - يبدأ من العمود B (2) لأن A مخفي
+    sheet.getRange(writeRow, 2, 1, 7).merge()
       .setValue("📊 ملخص إحصائي — " + phase)
       .setBackground("#1b5e20").setFontColor("white")
       .setFontWeight("bold").setFontSize(12)
@@ -199,36 +212,37 @@ function refreshStats(sheet) {
     sheet.getRange(writeRow, 9).setValue(STATS_MARKER);
     writeRow++;
 
-    // رؤوس الأعمدة
-    sheet.getRange(writeRow, 1, 1, 6).setValues([["الفئة", "عدد الحجاج", "متوسط الزمن (ثانية)", "الزمن الأدنى (ثانية)", "الزمن الأعلى (ثانية)", "النسبة من الإجمالي"]])
-      .setBackground("#a5d6a7").setFontWeight("bold").setHorizontalAlignment("center");
+    // رؤوس الأعمدة - من B (2)
+    sheet.getRange(writeRow, 2, 1, 6).setValues([[
+      "الفئة", "عدد الحجاج", "متوسط الزمن (ثانية)",
+      "الزمن الأدنى (ثانية)", "الزمن الأعلى (ثانية)", "النسبة من الإجمالي"
+    ]]).setBackground("#a5d6a7").setFontWeight("bold").setHorizontalAlignment("center");
     sheet.getRange(writeRow, 9).setValue(STATS_MARKER);
     writeRow++;
 
-    // صفوف الإحصائيات
+    // صفوف الإحصائيات - من B (2)
     const statsData = [
       ["المسجل لهم بصمة",      withBio.length,    avg(withBio),    safeMin(withBio),    safeMax(withBio),    pct(withBio.length, total)],
       ["غير المسجل لهم بصمة", withoutBio.length, avg(withoutBio), safeMin(withoutBio), safeMax(withoutBio), pct(withoutBio.length, total)],
       ["الإجمالي",              total,             avg(allDur),     safeMin(allDur),     safeMax(allDur),     "—"]
     ];
 
-    sheet.getRange(writeRow, 1, statsData.length, 6).setValues(statsData)
+    sheet.getRange(writeRow, 2, statsData.length, 6).setValues(statsData)
       .setBackground("#e8f5e9").setHorizontalAlignment("center");
-    // تمييز صف الإجمالي
-    sheet.getRange(writeRow + 2, 1, 1, 6).setBackground("#c8e6c9").setFontWeight("bold");
+    sheet.getRange(writeRow + 2, 2, 1, 6).setBackground("#c8e6c9").setFontWeight("bold");
 
     for (let r = 0; r < statsData.length; r++) {
       sheet.getRange(writeRow + r, 9).setValue(STATS_MARKER);
     }
 
-    writeRow += statsData.length + 2;
+    writeRow += statsData.length + 1; // فراغ واحد فقط بين مراحل متعددة
   }
 }
 
 function findStatsStartRow(sheet) {
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    if ((data[i][8] || "") === STATS_MARKER) return i + 1; // 1-indexed
+    if ((data[i][8] || "") === STATS_MARKER) return i + 1;
   }
   return -1;
 }
@@ -237,9 +251,7 @@ function findStatsStartRow(sheet) {
 
 function getOrCreateSpreadsheet() {
   const files = DriveApp.getFilesByName(SPREADSHEET_NAME);
-  if (files.hasNext()) {
-    return SpreadsheetApp.open(files.next());
-  }
+  if (files.hasNext()) return SpreadsheetApp.open(files.next());
   return SpreadsheetApp.create(SPREADSHEET_NAME);
 }
 
@@ -253,7 +265,7 @@ function getOrCreateSheet(ss, sheetName) {
       .setFontWeight("bold")
       .setBackground("#c8e6c9");
   }
-  // عمود recordId داخلي للنظام فقط - يُخفى عن المستخدم
+  // عمود recordId داخلي للنظام فقط - مخفي عن المستخدم
   sheet.hideColumns(1);
   return sheet;
 }
@@ -266,9 +278,7 @@ function findRowById(sheet, recordId) {
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     if ((data[i][8] || "") === STATS_MARKER) continue;
-    if (String(data[i][0]) === String(recordId)) {
-      return i + 1;
-    }
+    if (String(data[i][0]) === String(recordId)) return i + 1;
   }
   return -1;
 }
