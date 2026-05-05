@@ -253,6 +253,8 @@ function getOrCreateSheet(ss, sheetName) {
       .setFontWeight("bold")
       .setBackground("#c8e6c9");
   }
+  // عمود recordId داخلي للنظام فقط - يُخفى عن المستخدم
+  sheet.hideColumns(1);
   return sheet;
 }
 
