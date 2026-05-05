@@ -1,5 +1,5 @@
 // ضع هنا رابط Web App بعد نشر Google Apps Script
-const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+const API_URL = "https://script.google.com/macros/s/AKfycbx8tdZwe9LV3fdojITj0hHkDw0nQvcYxhIgtIdgYergd4bdFSmaTsnpiSD0CORGqA1M/exec";
 
 let startTime1, startTime2;
 let timerInterval1, timerInterval2;
