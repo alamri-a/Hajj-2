@@ -40,6 +40,7 @@ function saveSetupChoice() {
     allDurations       = [];
     withBiometric      = [];
     withoutBiometric   = [];
+    localStorage.removeItem("hajjTableRows");
     updateFooterStats();
   }
 
@@ -50,7 +51,7 @@ function saveSetupChoice() {
 
   document.getElementById("setupModal").style.display = "none";
   updateStatusBar();
-  loadFromGoogleSheets();
+  loadFromLocalStorage();
 }
 
 function updateStatusBar() {
@@ -160,62 +161,6 @@ function stopTimer(id) {
     duration, biometric: fingerprint, delayReason: finalReason,
     phase: currentPhase
   });
-}
-
-// ══════════════════════════════════════════
-// Google Sheets - تحميل
-// ══════════════════════════════════════════
-
-async function loadFromGoogleSheets() {
-  if (!currentCheckpoint || !currentPhase || API_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
-    loadFromLocalStorage();
-    return;
-  }
-
-  try {
-    const url      = `${API_URL}?checkpoint=${encodeURIComponent(currentCheckpoint)}&phase=${encodeURIComponent(currentPhase)}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("فشل الاتصال: " + response.status);
-
-    const data = await response.json();
-    if (data.status !== "ok") throw new Error(data.message);
-
-    const tbody = document.querySelector("#logTable tbody");
-    tbody.innerHTML  = "";
-    allDurations     = [];
-    withBiometric    = [];
-    withoutBiometric = [];
-
-    data.records.forEach((record, index) => {
-      const row = tbody.insertRow();
-      row.dataset.recordId = record.recordId;
-      row.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${record.date}</td>
-        <td>${record.time}</td>
-        <td>${record.duration}</td>
-        <td>${record.biometric}</td>
-        <td>${record.delayReason}</td>
-      `;
-      const dur = Number(record.duration);
-      if (!isNaN(dur)) {
-        allDurations.push(dur);
-        if (record.biometric === "نعم") withBiometric.push(dur);
-        else                             withoutBiometric.push(dur);
-      }
-    });
-
-    saveTableData();
-    updateFooterStats();
-    updateRowNumbers();
-
-    processPendingQueue();
-    processPendingDeleteQueue();
-
-  } catch (err) {
-    console.warn("تعذّر التحميل من Google Sheets، يُستخدم التخزين المحلي:", err);
-    loadFromLocalStorage();
-  }
 }
 
 function loadFromLocalStorage() {
@@ -402,27 +347,6 @@ function saveTableData() {
 // مسح / تراجع / حذف صف
 // ══════════════════════════════════════════
 
-function clearData() {
-  if (!confirm("هل أنت متأكد أنك تريد البدء من جديد؟ سيتم مسح جميع البيانات.")) return;
-
-  localStorage.removeItem("hajjTableRows");
-  localStorage.removeItem("hajjPendingQueue");
-  localStorage.removeItem("hajjPendingDeleteQueue");
-
-  document.querySelector("#logTable tbody").innerHTML = "";
-  allDurations       = [];
-  withBiometric      = [];
-  withoutBiometric   = [];
-  pendingSyncQueue   = [];
-  pendingDeleteQueue = [];
-
-  document.getElementById("timer1").textContent = "00:00";
-  document.getElementById("timer2").textContent = "00:00";
-  updateFooterStats();
-
-  resetGoogleSheets();
-}
-
 function undoLastEntry() {
   const tbody   = document.querySelector("#logTable tbody");
   const lastRow = tbody.lastElementChild;
@@ -518,7 +442,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("setupModal").style.display = "none";
     updateStatusBar();
-    loadFromGoogleSheets();
+    loadFromLocalStorage();
+    processPendingQueue();
+    processPendingDeleteQueue();
   } else {
     document.getElementById("setupModal").style.display = "flex";
   }
