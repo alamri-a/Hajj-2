@@ -40,6 +40,7 @@ function saveSetupChoice() {
     allDurations       = [];
     withBiometric      = [];
     withoutBiometric   = [];
+    localStorage.removeItem("hajjTableRows");
     updateFooterStats();
   }
 
@@ -345,27 +346,6 @@ function saveTableData() {
 // ══════════════════════════════════════════
 // مسح / تراجع / حذف صف
 // ══════════════════════════════════════════
-
-function clearData() {
-  if (!confirm("هل أنت متأكد أنك تريد البدء من جديد؟ سيتم مسح جميع البيانات.")) return;
-
-  localStorage.removeItem("hajjTableRows");
-  localStorage.removeItem("hajjPendingQueue");
-  localStorage.removeItem("hajjPendingDeleteQueue");
-
-  document.querySelector("#logTable tbody").innerHTML = "";
-  allDurations       = [];
-  withBiometric      = [];
-  withoutBiometric   = [];
-  pendingSyncQueue   = [];
-  pendingDeleteQueue = [];
-
-  document.getElementById("timer1").textContent = "00:00";
-  document.getElementById("timer2").textContent = "00:00";
-  updateFooterStats();
-
-  resetGoogleSheets();
-}
 
 function undoLastEntry() {
   const tbody   = document.querySelector("#logTable tbody");
