@@ -34,8 +34,14 @@ function saveSetupChoice() {
     return;
   }
 
-  // إذا تغيّر المنفذ أو المرحلة امسح البيانات المحلية
-  if (checkpoint !== currentCheckpoint || phase !== currentPhase) {
+  const changed = checkpoint !== currentCheckpoint || phase !== currentPhase;
+
+  currentCheckpoint = checkpoint;
+  currentPhase      = phase;
+  localStorage.setItem("hajjCheckpoint", checkpoint);
+  localStorage.setItem("hajjPhase", phase);
+
+  if (changed) {
     document.querySelector("#logTable tbody").innerHTML = "";
     allDurations       = [];
     withBiometric      = [];
@@ -44,14 +50,8 @@ function saveSetupChoice() {
     updateFooterStats();
   }
 
-  currentCheckpoint = checkpoint;
-  currentPhase      = phase;
-  localStorage.setItem("hajjCheckpoint", checkpoint);
-  localStorage.setItem("hajjPhase", phase);
-
   document.getElementById("setupModal").style.display = "none";
   updateStatusBar();
-  loadFromLocalStorage();
 }
 
 function updateStatusBar() {
