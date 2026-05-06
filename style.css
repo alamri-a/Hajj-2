@@ -437,3 +437,40 @@ tbody td, tfoot td, tfoot th {
   cursor: pointer;
 }
 .modal-confirm:hover { background: var(--green-dark); }
+
+/* ═══════════════════════════════════════
+   تمرير الجدول أفقياً
+═══════════════════════════════════════ */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ═══════════════════════════════════════
+   تصميم الجوال
+═══════════════════════════════════════ */
+@media (max-width: 600px) {
+  .status-bar { font-size: 13px; padding: 8px 12px; gap: 4px; }
+  .status-sep { margin: 0 4px; }
+  .change-btn { font-size: 12px; padding: 4px 10px; margin: 0 4px; }
+
+  .timer-card { padding: 18px 14px; }
+  .timer-card-title { font-size: 16px; }
+  .timer-display { font-size: 38px; }
+  .big-button { font-size: 17px; padding: 11px 20px; }
+
+  button.undo { font-size: 15px; padding: 8px 18px; }
+  .toggle-timer2 { font-size: 14px; padding: 7px 18px; }
+
+  .table-card { padding: 14px 10px; }
+  .table-header-row { flex-direction: column; align-items: flex-start; }
+  .table-title { font-size: 16px; }
+  .table-actions { width: 100%; justify-content: flex-start; gap: 6px; }
+  .action-btn { font-size: 12px; padding: 6px 10px; }
+  .row-input { width: 70px; font-size: 13px; }
+
+  table { font-size: 12px; }
+  thead tr th, tbody td, tfoot td, tfoot th { padding: 7px 5px; }
+
+  .page-content { padding: 12px 8px 30px; }
+}
