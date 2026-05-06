@@ -96,8 +96,14 @@ button.reset {
 
 /* زر التراجع */
 button.undo {
-  background-color: #808080; /* أصفر */
+  background-color: #808080;
   color: white;
+}
+
+button.undo:disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
 }
 
 /* تنسيق خيارات سبب التأخير الجديدة */

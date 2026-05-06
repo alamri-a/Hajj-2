@@ -9,6 +9,7 @@ let currentPhase = "";
 let pendingSyncQueue = [];
 let pendingDeleteQueue = [];
 let timer2Visible = false;
+let canUndo = false;
 
 // ══════════════════════════════════════════
 // إعداد المنفذ والمرحلة
@@ -152,6 +153,9 @@ function stopTimer(id) {
   if (selectedExtra) selectedExtra.checked = false;
   if (id === 1) startTime1 = null;
   else          startTime2 = null;
+
+  canUndo = true;
+  document.querySelector("button.undo").disabled = false;
 
   saveTableData();
   updateFooterStats();
@@ -348,9 +352,13 @@ function saveTableData() {
 // ══════════════════════════════════════════
 
 function undoLastEntry() {
+  if (!canUndo) return;
   const tbody   = document.querySelector("#logTable tbody");
   const lastRow = tbody.lastElementChild;
   if (!lastRow) return;
+
+  canUndo = false;
+  document.querySelector("button.undo").disabled = true;
 
   const duration  = parseInt(lastRow.cells[3]?.textContent.trim());
   const biometric = lastRow.cells[4]?.textContent.trim();
