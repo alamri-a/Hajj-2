@@ -643,8 +643,9 @@ tfoot tr:last-child td { border-bottom: none; }
   .action-btn { font-size: 12px; padding: 6px 10px; }
   .row-input { width: 80px; }
 
-  table { font-size: 12px; }
-  thead tr th, tbody td, tfoot td, tfoot th { padding: 7px 5px; }
+  table { font-size: 10px; }
+  thead tr th { padding: 8px 4px; }
+  tbody td, tfoot td, tfoot th { padding: 8px 3px; }
 
   .perf-summary { padding: 16px 12px; }
   .metric-cards { grid-template-columns: repeat(3, 1fr); }
