@@ -146,6 +146,13 @@ function stopTimer(id) {
     return;
   }
 
+  const fingerprintEl = document.querySelector(`input[name="fingerprint${id}"]:checked`);
+  if (!fingerprintEl) {
+    alert("الرجاء الإجابة على سؤال البصمة أولاً.");
+    return;
+  }
+  const fingerprint = fingerprintEl.value;
+
   clearInterval(id === 1 ? timerInterval1 : timerInterval2);
 
   const now = new Date();
@@ -155,12 +162,6 @@ function stopTimer(id) {
   if (id === 2 && timerState2 === 2) totalPaused2 += now - pauseStart2;
 
   const duration = Math.floor((now - (id === 1 ? startTime1 : startTime2) - (id === 1 ? totalPaused1 : totalPaused2)) / 1000);
-  const fingerprintEl = document.querySelector(`input[name="fingerprint${id}"]:checked`);
-  if (!fingerprintEl) {
-    alert("الرجاء الإجابة على سؤال البصمة أولاً.");
-    return;
-  }
-  const fingerprint = fingerprintEl.value;
   const delayText   = document.getElementById(`delayReason${id}`).value.trim();
   const selectedExtra = document.querySelector(`input[name="delayOption${id}"]:checked`);
   const extraReason   = selectedExtra ? selectedExtra.value : "";
