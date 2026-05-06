@@ -59,20 +59,11 @@ body {
   flex-shrink: 0;
 }
 
-.icon-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid var(--gray-border);
-  background: var(--white);
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s;
+.status-logo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
 }
-.icon-btn:hover { background: var(--green-light); }
 
 .status-sep { margin: 0 6px; color: #bbb; }
 
