@@ -41,6 +41,10 @@ th, td {
   background-color: red;
   color: white;
 }
+.pause-button {
+  background-color: #f57c00;
+  color: white;
+}
 .input-section {
   font-size: 22px;
   margin: 10px;
