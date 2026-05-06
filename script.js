@@ -56,6 +56,16 @@ function saveSetupChoice() {
 
   document.getElementById("setupModal").style.display = "none";
   updateStatusBar();
+  resetFingerprint(1);
+  resetFingerprint(2);
+}
+
+function resetFingerprint(id) {
+  if (currentPhase === "المغادرة") {
+    document.querySelector(`input[name="fingerprint${id}"][value="نعم"]`).checked = true;
+  } else {
+    document.querySelectorAll(`input[name="fingerprint${id}"]`).forEach(r => r.checked = false);
+  }
 }
 
 function updateStatusBar() {
@@ -145,7 +155,12 @@ function stopTimer(id) {
   if (id === 2 && timerState2 === 2) totalPaused2 += now - pauseStart2;
 
   const duration = Math.floor((now - (id === 1 ? startTime1 : startTime2) - (id === 1 ? totalPaused1 : totalPaused2)) / 1000);
-  const fingerprint = document.querySelector(`input[name="fingerprint${id}"]:checked`).value;
+  const fingerprintEl = document.querySelector(`input[name="fingerprint${id}"]:checked`);
+  if (!fingerprintEl) {
+    alert("الرجاء الإجابة على سؤال البصمة أولاً.");
+    return;
+  }
+  const fingerprint = fingerprintEl.value;
   const delayText   = document.getElementById(`delayReason${id}`).value.trim();
   const selectedExtra = document.querySelector(`input[name="delayOption${id}"]:checked`);
   const extraReason   = selectedExtra ? selectedExtra.value : "";
@@ -180,6 +195,7 @@ function stopTimer(id) {
   document.getElementById(`timer${id}`).textContent  = "00:00";
   document.getElementById(`delayReason${id}`).value  = "";
   if (selectedExtra) selectedExtra.checked = false;
+  resetFingerprint(id);
 
   if (id === 1) {
     startTime1 = null; timerState1 = 0; totalPaused1 = 0; pauseStart1 = null;
@@ -486,6 +502,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("setupModal").style.display = "none";
     updateStatusBar();
+    resetFingerprint(1);
+    resetFingerprint(2);
     loadFromLocalStorage();
     processPendingQueue();
     processPendingDeleteQueue();
