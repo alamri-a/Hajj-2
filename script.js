@@ -3,9 +3,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx8tdZwe9LV3fdojITj0hHk
 
 let startTime1, startTime2;
 let timerInterval1, timerInterval2;
-let timerState1 = 0, timerState2 = 0;   // 0=idle 1=running 2=paused
-let pauseStart1 = null, pauseStart2 = null;
-let totalPaused1 = 0, totalPaused2 = 0;
+let timerState1 = 0, timerState2 = 0;   // 0=idle 1=running 2=stopped
 let allDurations = [], withBiometric = [], withoutBiometric = [];
 let currentCheckpoint = "";
 let currentPhase = "";
@@ -105,38 +103,26 @@ function startTimer(id) {
   const now   = new Date();
 
   if (state === 0) {
-    // بدء جديد
-    if (id === 1) { startTime1 = now; totalPaused1 = 0; timerState1 = 1; }
-    else          { startTime2 = now; totalPaused2 = 0; timerState2 = 1; }
+    // بدء
+    if (id === 1) { startTime1 = now; timerState1 = 1; }
+    else          { startTime2 = now; timerState2 = 1; }
     clearInterval(id === 1 ? timerInterval1 : timerInterval2);
     const iv = setInterval(() => {
-      const elapsed = Math.floor((new Date() - (id === 1 ? startTime1 : startTime2) - (id === 1 ? totalPaused1 : totalPaused2)) / 1000);
+      const elapsed = Math.floor((new Date() - (id === 1 ? startTime1 : startTime2)) / 1000);
       document.getElementById(`timer${id}`).textContent = `00:${elapsed < 10 ? '0' : ''}${elapsed}`;
     }, 1000);
     if (id === 1) timerInterval1 = iv; else timerInterval2 = iv;
-    btn.textContent = "⏸ إيقاف مؤقت";
-    btn.className = "big-button pause-button";
+    btn.textContent = "■ إيقاف";
+    btn.className = "big-button stop-button";
 
   } else if (state === 1) {
-    // إيقاف مؤقت
+    // إيقاف نهائي
     clearInterval(id === 1 ? timerInterval1 : timerInterval2);
-    if (id === 1) { pauseStart1 = now; timerState1 = 2; }
-    else          { pauseStart2 = now; timerState2 = 2; }
-    btn.textContent = "▶ استئناف";
-    btn.className = "big-button start-button";
-
-  } else {
-    // استئناف
-    const extra = now - (id === 1 ? pauseStart1 : pauseStart2);
-    if (id === 1) { totalPaused1 += extra; timerState1 = 1; }
-    else          { totalPaused2 += extra; timerState2 = 1; }
-    const iv = setInterval(() => {
-      const elapsed = Math.floor((new Date() - (id === 1 ? startTime1 : startTime2) - (id === 1 ? totalPaused1 : totalPaused2)) / 1000);
-      document.getElementById(`timer${id}`).textContent = `00:${elapsed < 10 ? '0' : ''}${elapsed}`;
-    }, 1000);
-    if (id === 1) timerInterval1 = iv; else timerInterval2 = iv;
-    btn.textContent = "⏸ إيقاف مؤقت";
-    btn.className = "big-button pause-button";
+    if (id === 1) timerState1 = 2;
+    else          timerState2 = 2;
+    btn.textContent = "■ موقوف";
+    btn.className = "big-button stop-button";
+    btn.disabled = true;
   }
 }
 
@@ -153,15 +139,8 @@ function stopTimer(id) {
   }
   const fingerprint = fingerprintEl.value;
 
-  clearInterval(id === 1 ? timerInterval1 : timerInterval2);
-
-  const now = new Date();
-
-  // إذا كان موقوفاً مؤقتاً أضف وقت الإيقاف الأخير
-  if (id === 1 && timerState1 === 2) totalPaused1 += now - pauseStart1;
-  if (id === 2 && timerState2 === 2) totalPaused2 += now - pauseStart2;
-
-  const duration = Math.floor((now - (id === 1 ? startTime1 : startTime2) - (id === 1 ? totalPaused1 : totalPaused2)) / 1000);
+  const now      = new Date();
+  const duration = Math.floor((now - (id === 1 ? startTime1 : startTime2)) / 1000);
   const delayText   = document.getElementById(`delayReason${id}`).value.trim();
   const selectedExtra = document.querySelector(`input[name="delayOption${id}"]:checked`);
   const extraReason   = selectedExtra ? selectedExtra.value : "";
@@ -198,14 +177,12 @@ function stopTimer(id) {
   if (selectedExtra) selectedExtra.checked = false;
   resetFingerprint(id);
 
-  if (id === 1) {
-    startTime1 = null; timerState1 = 0; totalPaused1 = 0; pauseStart1 = null;
-  } else {
-    startTime2 = null; timerState2 = 0; totalPaused2 = 0; pauseStart2 = null;
-  }
+  if (id === 1) { startTime1 = null; timerState1 = 0; }
+  else          { startTime2 = null; timerState2 = 0; }
   const btn = document.getElementById(`startBtn${id}`);
   btn.textContent = "▶ بدء";
   btn.className = "big-button start-button";
+  btn.disabled = false;
 
   canUndo = true;
   document.querySelector("button.undo").disabled = false;
