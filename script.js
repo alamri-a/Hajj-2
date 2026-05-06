@@ -74,7 +74,7 @@ function updateStatusBar() {
 }
 
 // ══════════════════════════════════════════
-// التايمر الثاني - إظهار/إخفاء
+// المؤقت الثاني - إظهار/إخفاء
 // ══════════════════════════════════════════
 
 function toggleTimer2() {
@@ -82,7 +82,7 @@ function toggleTimer2() {
   const section = document.getElementById("timer2Section");
   const btn     = document.getElementById("toggleTimer2Btn");
   section.style.display = timer2Visible ? "block" : "none";
-  btn.textContent       = timer2Visible ? "－ إخفاء التايمر الثاني" : "⏱ إظهار التايمر الثاني";
+  btn.textContent       = timer2Visible ? "－ إخفاء المؤقت الثاني" : "⏱ إظهار المؤقت الثاني";
   localStorage.setItem("hajjTimer2Visible", timer2Visible ? "1" : "0");
 }
 
@@ -464,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
   pendingSyncQueue   = JSON.parse(localStorage.getItem("hajjPendingQueue")       || "[]");
   pendingDeleteQueue = JSON.parse(localStorage.getItem("hajjPendingDeleteQueue") || "[]");
 
-  // استعادة حالة التايمر الثاني
+  // استعادة حالة المؤقت الثاني
   if (localStorage.getItem("hajjTimer2Visible") === "1") {
     timer2Visible = false;
     toggleTimer2();
