@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>قياس مزدوج لإجراءات الحجاج</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>قياس زمن إجراءات الحجاج</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -36,6 +37,17 @@
   </div>
 </div>
 
+<!-- ===== الهيدر ===== -->
+<header class="site-header">
+  <div class="header-logos-right">
+    <img src="passports.PNG" alt="الجوازات" class="header-logo">
+    <img src="interior.PNG" alt="وزارة الداخلية" class="header-logo">
+  </div>
+  <div class="header-center">
+    <img src="vision2030.PNG" alt="رؤية 2030" class="header-logo-vision">
+  </div>
+</header>
+
 <!-- ===== شريط الحالة ===== -->
 <div id="statusBar" class="status-bar" style="display:none">
   <span>المنفذ: <strong id="statusCheckpoint">-</strong></span>
@@ -45,138 +57,148 @@
 </div>
 
 <!-- ===== أزرار التحكم العامة ===== -->
-<div style="text-align: center; margin-top: 20px;">
+<div class="controls-bar">
   <button class="undo" onclick="undoLastEntry()" disabled>
     <span class="icon">↩️</span> تراجع
   </button>
 </div>
 
 <!-- ===== التايمر الأول ===== -->
-<h2>قياس زمن إنهاء إجراءات الحاج - 1</h2>
-<div class="section">
-  <button class="big-button start-button" id="startBtn1" onclick="startTimer(1)">▶ بدء</button>
-  <button class="big-button stop-button" id="sendBtn1" onclick="stopTimer(1)" disabled>إرسال</button>
-  <div class="timer" id="timer1">00:00</div>
-
-  <div class="input-section">
-    <label>هل الحاج مسجل له بصمة سابقًا؟</label>
-    <input type="radio" name="fingerprint1" value="نعم"> نعم
-    <input type="radio" name="fingerprint1" value="لا"> لا
-  </div>
-
-  <div class="input-section">
-    <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
-  </div>
-
-  <div class="input-section delay-extra">
-    <label>
-      <input type="radio" name="delayOption1" value="صعوبة قراءة البصمة">
-      صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
-    </label><br>
-    <label>
-      <input type="radio" name="delayOption1" value="التحقق من القوائم الأمنية">
-      التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
-    </label>
-  </div>
-</div>
-
-<!-- ===== زر إظهار/إخفاء التايمر الثاني ===== -->
-<div style="text-align: center; margin-top: 15px;">
-  <button id="toggleTimer2Btn" class="toggle-timer2" onclick="toggleTimer2()">
-    ＋ إظهار التايمر الثاني
-  </button>
-</div>
-
-<!-- ===== التايمر الثاني (مخفي بالافتراضي) ===== -->
-<div id="timer2Section" style="display:none">
-  <h2>قياس زمن إنهاء إجراءات الحاج - 2</h2>
-  <div class="section">
-    <button class="big-button start-button" id="startBtn2" onclick="startTimer(2)">▶ بدء</button>
-    <button class="big-button stop-button" id="sendBtn2" onclick="stopTimer(2)" disabled>إرسال</button>
-    <div class="timer" id="timer2">00:00</div>
-
-    <div class="input-section">
-      <label>هل الحاج مسجل له بصمة سابقًا؟</label>
-      <input type="radio" name="fingerprint2" value="نعم"> نعم
-      <input type="radio" name="fingerprint2" value="لا"> لا
+<div class="page-content">
+  <div class="timer-card">
+    <div class="timer-card-title">قياس زمن إنهاء إجراءات الحاج — 1</div>
+    <div class="timer-display" id="timer1">00:00</div>
+    <div class="timer-buttons">
+      <button class="big-button start-button" id="startBtn1" onclick="startTimer(1)">▶ بدء</button>
+      <button class="big-button send-button" id="sendBtn1" onclick="stopTimer(1)" disabled>إرسال ⬆</button>
     </div>
 
     <div class="input-section">
-      <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
+      <label class="question-label">هل الحاج مسجل له بصمة سابقًا؟</label>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="fingerprint1" value="نعم"> نعم</label>
+        <label class="radio-option"><input type="radio" name="fingerprint1" value="لا"> لا</label>
+      </div>
     </div>
 
-    <div class="input-section delay-extra">
-      <label>
-        <input type="radio" name="delayOption2" value="صعوبة قراءة البصمة">
+    <div class="input-section">
+      <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
+    </div>
+
+    <div class="delay-extra">
+      <label class="radio-option">
+        <input type="radio" name="delayOption1" value="صعوبة قراءة البصمة">
         صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
-      </label><br>
-      <label>
-        <input type="radio" name="delayOption2" value="التحقق من القوائم الأمنية">
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="delayOption1" value="التحقق من القوائم الأمنية">
         التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
       </label>
     </div>
   </div>
+
+  <!-- ===== زر إظهار/إخفاء التايمر الثاني ===== -->
+  <div style="text-align: center; margin: 16px 0;">
+    <button id="toggleTimer2Btn" class="toggle-timer2" onclick="toggleTimer2()">
+      ＋ إظهار التايمر الثاني
+    </button>
+  </div>
+
+  <!-- ===== التايمر الثاني ===== -->
+  <div id="timer2Section" style="display:none">
+    <div class="timer-card">
+      <div class="timer-card-title">قياس زمن إنهاء إجراءات الحاج — 2</div>
+      <div class="timer-display" id="timer2">00:00</div>
+      <div class="timer-buttons">
+        <button class="big-button start-button" id="startBtn2" onclick="startTimer(2)">▶ بدء</button>
+        <button class="big-button send-button" id="sendBtn2" onclick="stopTimer(2)" disabled>إرسال ⬆</button>
+      </div>
+
+      <div class="input-section">
+        <label class="question-label">هل الحاج مسجل له بصمة سابقًا؟</label>
+        <div class="radio-group">
+          <label class="radio-option"><input type="radio" name="fingerprint2" value="نعم"> نعم</label>
+          <label class="radio-option"><input type="radio" name="fingerprint2" value="لا"> لا</label>
+        </div>
+      </div>
+
+      <div class="input-section">
+        <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
+      </div>
+
+      <div class="delay-extra">
+        <label class="radio-option">
+          <input type="radio" name="delayOption2" value="صعوبة قراءة البصمة">
+          صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="delayOption2" value="التحقق من القوائم الأمنية">
+          التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== جدول السجل ===== -->
+  <div class="table-card">
+    <div class="table-header-row">
+      <span class="table-title">سجل الحجاج</span>
+      <div class="table-actions">
+        <button class="action-btn" onclick="saveTableAsExcel()">📥 حفظ Excel</button>
+        <input type="number" id="rowToDelete" placeholder="رقم الصف" class="row-input">
+        <button class="action-btn danger" onclick="deleteRowByNumber()">🗑️ حذف صف</button>
+      </div>
+    </div>
+
+    <table id="logTable">
+      <thead>
+        <tr>
+          <th>التعداد</th>
+          <th>التاريخ</th>
+          <th>الساعة</th>
+          <th>المدة (ثانية)</th>
+          <th>بصمة سابقة؟</th>
+          <th>سبب التأخير</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr class="stats-header-row">
+          <th>الفئة</th>
+          <th>عدد الحجاج</th>
+          <th>متوسط الزمن</th>
+          <th>الأدنى</th>
+          <th>الأعلى</th>
+          <th>النسبة</th>
+        </tr>
+        <tr id="stats-biometric">
+          <td>المسجل لهم بصمة</td>
+          <td id="countWith">0</td>
+          <td id="avgWith">0</td>
+          <td id="minWith">0</td>
+          <td id="maxWith">0</td>
+          <td id="percentWith">0%</td>
+        </tr>
+        <tr id="stats-nonbiometric">
+          <td>غير المسجل لهم بصمة</td>
+          <td id="countWithout">0</td>
+          <td id="avgWithout">0</td>
+          <td id="minWithout">0</td>
+          <td id="maxWithout">0</td>
+          <td id="percentWithout">0%</td>
+        </tr>
+        <tr id="stats-total">
+          <td>الإجمالي</td>
+          <td id="countTotal">0</td>
+          <td id="avgTotal">0</td>
+          <td id="minTotal">0</td>
+          <td id="maxTotal">0</td>
+          <td>—</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 </div>
-
-<!-- ===== جدول السجل ===== -->
-<h2 style="text-align: right; margin-top: 40px;">
-  سجل الحجاج
-
-  <button onclick="saveTableAsExcel()" style="font-size: 16px; padding: 5px 10px; margin-right: 10px;">
-    📥 حفظ Excel
-  </button>
-  <span style="display: inline-block; width: 40px;"></span>
-  <input type="number" id="rowToDelete" placeholder="رقم الصف" style="font-size: 16px; width: 100px; margin-right: 5px;">
-  <button onclick="deleteRowByNumber()" style="font-size: 16px; padding: 5px 10px;">🗑️ حذف صف</button>
-</h2>
-
-<table id="logTable">
-  <thead>
-    <tr>
-      <th>التعداد</th>
-      <th>التاريخ</th>
-      <th>الساعة</th>
-      <th>المدة بالثواني</th>
-      <th>مسجل له بصمة سابقًا؟</th>
-      <th>سبب التأخير</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-  <tfoot>
-    <tr style="background-color: #ddd; font-weight: bold;">
-      <th>الفئة</th>
-      <th colspan="1">عدد الحجاج</th>
-      <th colspan="1">متوسط الزمن (ثانية)</th>
-      <th colspan="1">الزمن الأدنى (ثانية)</th>
-      <th colspan="1">الزمن الأعلى (ثانية)</th>
-      <th colspan="1">النسبة من الإجمالي</th>
-    </tr>
-    <tr id="stats-biometric">
-      <td>المسجل لهم بصمة</td>
-      <td id="countWith">0</td>
-      <td id="avgWith">0</td>
-      <td id="minWith">0</td>
-      <td id="maxWith">0</td>
-      <td id="percentWith">0%</td>
-    </tr>
-    <tr id="stats-nonbiometric">
-      <td>غير المسجل لهم بصمة</td>
-      <td id="countWithout">0</td>
-      <td id="avgWithout">0</td>
-      <td id="minWithout">0</td>
-      <td id="maxWithout">0</td>
-      <td id="percentWithout">0%</td>
-    </tr>
-    <tr id="stats-total">
-      <td>الإجمالي</td>
-      <td id="countTotal">0</td>
-      <td id="avgTotal">0</td>
-      <td id="minTotal">0</td>
-      <td id="maxTotal">0</td>
-      <td>—</td>
-    </tr>
-  </tfoot>
-</table>
 
 <script src="script.js"></script>
 </body>
