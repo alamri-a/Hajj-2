@@ -82,7 +82,7 @@ function toggleTimer2() {
   const section = document.getElementById("timer2Section");
   const btn     = document.getElementById("toggleTimer2Btn");
   section.style.display = timer2Visible ? "block" : "none";
-  btn.textContent       = timer2Visible ? "－ إخفاء التايمر الثاني" : "＋ إظهار التايمر الثاني";
+  btn.textContent       = timer2Visible ? "－ إخفاء التايمر الثاني" : "⏱ إظهار التايمر الثاني";
   localStorage.setItem("hajjTimer2Visible", timer2Visible ? "1" : "0");
 }
 
@@ -110,7 +110,8 @@ function startTimer(id) {
     clearInterval(id === 1 ? timerInterval1 : timerInterval2);
     const iv = setInterval(() => {
       const elapsed = Math.floor((new Date() - (id === 1 ? startTime1 : startTime2)) / 1000);
-      document.getElementById(`timer${id}`).textContent = `00:${elapsed < 10 ? '0' : ''}${elapsed}`;
+      const mm = Math.floor(elapsed / 60), ss = elapsed % 60;
+      document.getElementById(`timer${id}`).textContent = `${mm < 10 ? '0' : ''}${mm}:${ss < 10 ? '0' : ''}${ss}`;
     }, 1000);
     if (id === 1) timerInterval1 = iv; else timerInterval2 = iv;
     btn.textContent = "■ إيقاف";
@@ -349,6 +350,12 @@ function updateFooterStats() {
 
   document.getElementById("percentWith").textContent    = percent(withCount);
   document.getElementById("percentWithout").textContent = percent(withoutCount);
+
+  document.getElementById("perfCount").textContent   = total;
+  document.getElementById("perfAvg").textContent     = avg(allDurations);
+  document.getElementById("perfMin").textContent     = min(allDurations);
+  document.getElementById("perfMax").textContent     = max(allDurations);
+  document.getElementById("perfPercent").textContent = percent(withCount);
 }
 
 // ══════════════════════════════════════════

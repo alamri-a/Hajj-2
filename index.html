@@ -40,90 +40,115 @@
 
 <!-- ===== شريط الحالة ===== -->
 <div id="statusBar" class="status-bar" style="display:none">
-  <span>المنفذ: <strong id="statusCheckpoint">-</strong></span>
-  <span class="status-sep">|</span>
-  <span>المرحلة: <strong id="statusPhase">-</strong></span>
-  <button class="change-btn" onclick="showSetupModal()">⚙ تغيير</button>
+  <div class="status-icons">
+    <button class="icon-btn" onclick="showSetupModal()" title="الإعدادات">⚙</button>
+  </div>
+  <div class="status-info">
+    <span>المنفذ: <strong id="statusCheckpoint">-</strong></span>
+    <span class="status-sep">|</span>
+    <span>المرحلة: <strong id="statusPhase">-</strong></span>
+  </div>
+  <button class="change-btn" onclick="showSetupModal()">تغيير ✎</button>
 </div>
 
 <!-- ===== أزرار التحكم العامة ===== -->
 <div class="controls-bar">
-  <button class="undo" onclick="undoLastEntry()" disabled>
-    <span class="icon">↩️</span> تراجع
-  </button>
+  <button class="undo" onclick="undoLastEntry()" disabled>↩ تراجع</button>
 </div>
 
 <!-- ===== التايمر الأول ===== -->
 <div class="page-content">
   <div class="timer-card">
-    <div class="timer-card-title">قياس زمن إنهاء إجراءات الحاج — 1</div>
-    <div class="timer-display" id="timer1">00:00</div>
+    <div class="timer-card-title">⏱ قياس زمن إنهاء إجراءات الحاج — 1</div>
+    <div class="timer-subtitle">الزمن الجاري</div>
+    <div class="timer-box">
+      <div class="timer-display" id="timer1">00:00</div>
+    </div>
     <div class="timer-buttons">
       <button class="big-button start-button" id="startBtn1" onclick="startTimer(1)">▶ بدء</button>
       <button class="big-button send-button" id="sendBtn1" onclick="stopTimer(1)" disabled>إرسال ⬆</button>
     </div>
 
     <div class="input-section">
-      <label class="question-label">هل الحاج مسجل له بصمة سابقًا؟</label>
-      <div class="radio-group">
-        <label class="radio-option"><input type="radio" name="fingerprint1" value="نعم"> نعم</label>
-        <label class="radio-option"><input type="radio" name="fingerprint1" value="لا"> لا</label>
+      <label class="section-label">👆 هل الحاج مسجل له بصمة سابقًا؟</label>
+      <div class="radio-card-group">
+        <label class="radio-card">
+          <input type="radio" name="fingerprint1" value="نعم">
+          <span>نعم</span>
+        </label>
+        <label class="radio-card">
+          <input type="radio" name="fingerprint1" value="لا">
+          <span>لا</span>
+        </label>
       </div>
     </div>
 
     <div class="input-section">
-      <input type="text" id="delayReason1" placeholder="سبب التأخير (إن وجد)">
+      <label class="section-label">⏰ سبب التأخير (إن وجد)</label>
+      <input type="text" id="delayReason1" placeholder="اكتب سبب التأخير">
     </div>
 
     <div class="delay-extra">
-      <label class="radio-option">
+      <label class="section-label-sm">⚡ خيارات سريعة (اختياري)</label>
+      <label class="radio-card delay-card">
         <input type="radio" name="delayOption1" value="صعوبة قراءة البصمة">
-        صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
+        <span>👆 صعوبة قراءة البصمة</span>
       </label>
-      <label class="radio-option">
+      <label class="radio-card delay-card">
         <input type="radio" name="delayOption1" value="التحقق من القوائم الأمنية">
-        التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
+        <span>🛡 التحقق من القوائم الأمنية</span>
       </label>
     </div>
   </div>
 
   <!-- ===== زر إظهار/إخفاء التايمر الثاني ===== -->
-  <div style="text-align: center; margin: 16px 0;">
+  <div style="margin: 16px 0;">
     <button id="toggleTimer2Btn" class="toggle-timer2" onclick="toggleTimer2()">
-      ＋ إظهار التايمر الثاني
+      ⏱ إظهار التايمر الثاني
     </button>
   </div>
 
   <!-- ===== التايمر الثاني ===== -->
   <div id="timer2Section" style="display:none">
     <div class="timer-card">
-      <div class="timer-card-title">قياس زمن إنهاء إجراءات الحاج — 2</div>
-      <div class="timer-display" id="timer2">00:00</div>
+      <div class="timer-card-title">⏱ قياس زمن إنهاء إجراءات الحاج — 2</div>
+      <div class="timer-subtitle">الزمن الجاري</div>
+      <div class="timer-box">
+        <div class="timer-display" id="timer2">00:00</div>
+      </div>
       <div class="timer-buttons">
         <button class="big-button start-button" id="startBtn2" onclick="startTimer(2)">▶ بدء</button>
         <button class="big-button send-button" id="sendBtn2" onclick="stopTimer(2)" disabled>إرسال ⬆</button>
       </div>
 
       <div class="input-section">
-        <label class="question-label">هل الحاج مسجل له بصمة سابقًا؟</label>
-        <div class="radio-group">
-          <label class="radio-option"><input type="radio" name="fingerprint2" value="نعم"> نعم</label>
-          <label class="radio-option"><input type="radio" name="fingerprint2" value="لا"> لا</label>
+        <label class="section-label">👆 هل الحاج مسجل له بصمة سابقًا؟</label>
+        <div class="radio-card-group">
+          <label class="radio-card">
+            <input type="radio" name="fingerprint2" value="نعم">
+            <span>نعم</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="fingerprint2" value="لا">
+            <span>لا</span>
+          </label>
         </div>
       </div>
 
       <div class="input-section">
-        <input type="text" id="delayReason2" placeholder="سبب التأخير (إن وجد)">
+        <label class="section-label">⏰ سبب التأخير (إن وجد)</label>
+        <input type="text" id="delayReason2" placeholder="اكتب سبب التأخير">
       </div>
 
       <div class="delay-extra">
-        <label class="radio-option">
+        <label class="section-label-sm">⚡ خيارات سريعة (اختياري)</label>
+        <label class="radio-card delay-card">
           <input type="radio" name="delayOption2" value="صعوبة قراءة البصمة">
-          صعوبة قراءة البصمة <span class="optional-note">(اختياري)</span>
+          <span>👆 صعوبة قراءة البصمة</span>
         </label>
-        <label class="radio-option">
+        <label class="radio-card delay-card">
           <input type="radio" name="delayOption2" value="التحقق من القوائم الأمنية">
-          التحقق من القوائم الأمنية <span class="optional-note">(اختياري)</span>
+          <span>🛡 التحقق من القوائم الأمنية</span>
         </label>
       </div>
     </div>
@@ -132,11 +157,11 @@
   <!-- ===== جدول السجل ===== -->
   <div class="table-card">
     <div class="table-header-row">
-      <span class="table-title">سجل الحجاج</span>
+      <span class="table-title">📋 سجل الحجاج</span>
       <div class="table-actions">
-        <button class="action-btn" onclick="saveTableAsExcel()">📥 حفظ Excel</button>
-        <input type="number" id="rowToDelete" placeholder="رقم الصف" class="row-input">
-        <button class="action-btn danger" onclick="deleteRowByNumber()">🗑️ حذف صف</button>
+        <button class="action-btn" onclick="saveTableAsExcel()">Excel 📊</button>
+        <input type="number" id="rowToDelete" placeholder="# رقم الصف" class="row-input">
+        <button class="action-btn danger" onclick="deleteRowByNumber()">حذف صف 🗑</button>
       </div>
     </div>
 
@@ -189,6 +214,39 @@
       </tfoot>
     </table>
     </div>
+  </div>
+
+  <!-- ===== ملخص الأداء ===== -->
+  <div class="perf-summary">
+    <div class="perf-title">📊 ملخص الأداء</div>
+    <div class="metric-cards">
+      <div class="metric-card">
+        <div class="metric-icon">👥</div>
+        <div class="metric-label">عدد الحجاج</div>
+        <div class="metric-value" id="perfCount">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon mc-clock">⏱</div>
+        <div class="metric-label">متوسط زمن (ث)</div>
+        <div class="metric-value" id="perfAvg">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon mc-down">↓</div>
+        <div class="metric-label">أدنى زمن (ث)</div>
+        <div class="metric-value" id="perfMin">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon mc-up">↑</div>
+        <div class="metric-label">أعلى زمن (ث)</div>
+        <div class="metric-value" id="perfMax">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon mc-pct">%</div>
+        <div class="metric-label">نسبة البصمة</div>
+        <div class="metric-value" id="perfPercent">0%</div>
+      </div>
+    </div>
+    <div class="perf-footer">ℹ جميع الأوقات محسوبة بالثواني</div>
   </div>
 </div>
 
