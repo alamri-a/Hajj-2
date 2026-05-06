@@ -462,7 +462,6 @@ tfoot { border-top: 10px solid var(--gray-bg); }
   background: var(--green-light);
   color: var(--green-dark);
   padding: 12px 16px;
-  font-size: 14px;
   font-weight: 700;
   border: none;
   white-space: nowrap;
