@@ -4,6 +4,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx8tdZwe9LV3fdojITj0hHk
 let startTime1, startTime2;
 let timerInterval1, timerInterval2;
 let timerState1 = 0, timerState2 = 0;   // 0=idle 1=running 2=stopped
+let stopTime1 = null, stopTime2 = null;
 let allDurations = [], withBiometric = [], withoutBiometric = [];
 let currentCheckpoint = "";
 let currentPhase = "";
@@ -118,8 +119,8 @@ function startTimer(id) {
   } else if (state === 1) {
     // إيقاف نهائي
     clearInterval(id === 1 ? timerInterval1 : timerInterval2);
-    if (id === 1) timerState1 = 2;
-    else          timerState2 = 2;
+    if (id === 1) { timerState1 = 2; stopTime1 = now; }
+    else          { timerState2 = 2; stopTime2 = now; }
     btn.textContent = "■ موقوف";
     btn.className = "big-button stop-button";
     btn.disabled = true;
@@ -140,8 +141,8 @@ function stopTimer(id) {
   }
   const fingerprint = fingerprintEl.value;
 
-  const now      = new Date();
-  const duration = Math.floor((now - (id === 1 ? startTime1 : startTime2)) / 1000);
+  const stopped  = id === 1 ? stopTime1 : stopTime2;
+  const duration = Math.floor((stopped - (id === 1 ? startTime1 : startTime2)) / 1000);
   const delayText   = document.getElementById(`delayReason${id}`).value.trim();
   const selectedExtra = document.querySelector(`input[name="delayOption${id}"]:checked`);
   const extraReason   = selectedExtra ? selectedExtra.value : "";
@@ -155,8 +156,8 @@ function stopTimer(id) {
   if (fingerprint === "نعم") withBiometric.push(duration);
   else                        withoutBiometric.push(duration);
 
-  const date = now.toLocaleDateString('en-GB');
-  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const date = stopped.toLocaleDateString('en-GB');
+  const time = stopped.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
   const tbody    = document.querySelector("#logTable tbody");
   const rowNum   = tbody.rows.length + 1;
@@ -178,8 +179,8 @@ function stopTimer(id) {
   if (selectedExtra) selectedExtra.checked = false;
   resetFingerprint(id);
 
-  if (id === 1) { startTime1 = null; timerState1 = 0; }
-  else          { startTime2 = null; timerState2 = 0; }
+  if (id === 1) { startTime1 = null; timerState1 = 0; stopTime1 = null; }
+  else          { startTime2 = null; timerState2 = 0; stopTime2 = null; }
   const btn = document.getElementById(`startBtn${id}`);
   btn.textContent = "▶ بدء";
   btn.className = "big-button start-button";
