@@ -123,6 +123,7 @@ function startTimer(id) {
     btn.textContent = "■ موقوف";
     btn.className = "big-button stop-button";
     btn.disabled = true;
+    document.getElementById(`sendBtn${id}`).disabled = false;
   }
 }
 
@@ -183,6 +184,7 @@ function stopTimer(id) {
   btn.textContent = "▶ بدء";
   btn.className = "big-button start-button";
   btn.disabled = false;
+  document.getElementById(`sendBtn${id}`).disabled = true;
 
   canUndo = true;
   document.querySelector("button.undo").disabled = false;

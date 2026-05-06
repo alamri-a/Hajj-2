@@ -55,7 +55,7 @@
 <h2>قياس زمن إنهاء إجراءات الحاج - 1</h2>
 <div class="section">
   <button class="big-button start-button" id="startBtn1" onclick="startTimer(1)">▶ بدء</button>
-  <button class="big-button stop-button" onclick="stopTimer(1)">إرسال</button>
+  <button class="big-button stop-button" id="sendBtn1" onclick="stopTimer(1)" disabled>إرسال</button>
   <div class="timer" id="timer1">00:00</div>
 
   <div class="input-section">
@@ -92,7 +92,7 @@
   <h2>قياس زمن إنهاء إجراءات الحاج - 2</h2>
   <div class="section">
     <button class="big-button start-button" id="startBtn2" onclick="startTimer(2)">▶ بدء</button>
-    <button class="big-button stop-button" onclick="stopTimer(2)">إرسال</button>
+    <button class="big-button stop-button" id="sendBtn2" onclick="stopTimer(2)" disabled>إرسال</button>
     <div class="timer" id="timer2">00:00</div>
 
     <div class="input-section">
