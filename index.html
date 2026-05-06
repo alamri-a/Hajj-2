@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>قياس زمن إجراءات الحجاج</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -40,37 +41,37 @@
 
 <!-- ===== شريط الحالة ===== -->
 <div id="statusBar" class="status-bar" style="display:none">
-  <div class="status-icons">
-    <img src="passports.PNG" class="status-logo" alt="الجوازات">
-  </div>
+  <button class="change-btn" onclick="showSetupModal()">تغيير <i data-lucide="settings" class="btn-icon"></i></button>
   <div class="status-info">
     <span>المنفذ: <strong id="statusCheckpoint">-</strong></span>
     <span class="status-sep">|</span>
     <span>المرحلة: <strong id="statusPhase">-</strong></span>
   </div>
-  <button class="change-btn" onclick="showSetupModal()">تغيير ✎</button>
+  <img src="Passports1.PNG" class="status-logo" alt="الجوازات">
 </div>
 
 <!-- ===== أزرار التحكم العامة ===== -->
 <div class="controls-bar">
-  <button class="undo" onclick="undoLastEntry()" disabled>↩ تراجع</button>
+  <button class="undo" onclick="undoLastEntry()" disabled>
+    <i data-lucide="rotate-ccw" class="btn-icon"></i> تراجع
+  </button>
 </div>
 
 <!-- ===== المؤقت الأول ===== -->
 <div class="page-content">
   <div class="timer-card">
-    <div class="timer-card-title">⏱ قياس زمن إنهاء إجراءات الحاج — المؤقت 1</div>
+    <div class="timer-card-title"><i data-lucide="timer" class="title-icon"></i> قياس زمن إنهاء إجراءات الحاج — المؤقت 1</div>
     <div class="timer-subtitle">الزمن الجاري</div>
     <div class="timer-box">
       <div class="timer-display" id="timer1">00:00</div>
     </div>
     <div class="timer-buttons">
       <button class="big-button start-button" id="startBtn1" onclick="startTimer(1)">▶ بدء</button>
-      <button class="big-button send-button" id="sendBtn1" onclick="stopTimer(1)" disabled>إرسال ⬆</button>
+      <button class="big-button send-button" id="sendBtn1" onclick="stopTimer(1)" disabled>إرسال <i data-lucide="send" class="btn-icon"></i></button>
     </div>
 
     <div class="input-section">
-      <label class="section-label">👆 هل الحاج مسجل له بصمة سابقًا؟</label>
+      <label class="section-label"><i data-lucide="fingerprint" class="section-icon"></i> هل الحاج مسجل له بصمة سابقًا؟</label>
       <div class="radio-card-group">
         <label class="radio-card">
           <input type="radio" name="fingerprint1" value="نعم">
@@ -84,19 +85,19 @@
     </div>
 
     <div class="input-section">
-      <label class="section-label">⏰ سبب التأخير (إن وجد)</label>
+      <label class="section-label"><i data-lucide="clock" class="section-icon"></i> سبب التأخير (إن وجد)</label>
       <input type="text" id="delayReason1" placeholder="اكتب سبب التأخير">
     </div>
 
     <div class="delay-extra">
-      <label class="section-label-sm">⚡ خيارات سريعة (اختياري)</label>
+      <label class="section-label-sm"><i data-lucide="zap" class="section-icon-sm"></i> خيارات سريعة (اختياري)</label>
       <label class="radio-card delay-card">
         <input type="radio" name="delayOption1" value="صعوبة قراءة البصمة">
-        <span>👆 صعوبة قراءة البصمة</span>
+        <span><i data-lucide="fingerprint" class="card-icon"></i> صعوبة قراءة البصمة</span>
       </label>
       <label class="radio-card delay-card">
         <input type="radio" name="delayOption1" value="التحقق من القوائم الأمنية">
-        <span>🛡 التحقق من القوائم الأمنية</span>
+        <span><i data-lucide="shield" class="card-icon"></i> التحقق من القوائم الأمنية</span>
       </label>
     </div>
   </div>
@@ -104,25 +105,25 @@
   <!-- ===== زر إظهار/إخفاء المؤقت الثاني ===== -->
   <div style="margin: 16px 0;">
     <button id="toggleTimer2Btn" class="toggle-timer2" onclick="toggleTimer2()">
-      ⏱ إظهار المؤقت الثاني
+      <i data-lucide="timer" class="btn-icon"></i> إظهار المؤقت الثاني
     </button>
   </div>
 
   <!-- ===== المؤقت الثاني ===== -->
   <div id="timer2Section" style="display:none">
     <div class="timer-card">
-      <div class="timer-card-title">⏱ قياس زمن إنهاء إجراءات الحاج — المؤقت 2</div>
+      <div class="timer-card-title"><i data-lucide="timer" class="title-icon"></i> قياس زمن إنهاء إجراءات الحاج — المؤقت 2</div>
       <div class="timer-subtitle">الزمن الجاري</div>
       <div class="timer-box">
         <div class="timer-display" id="timer2">00:00</div>
       </div>
       <div class="timer-buttons">
         <button class="big-button start-button" id="startBtn2" onclick="startTimer(2)">▶ بدء</button>
-        <button class="big-button send-button" id="sendBtn2" onclick="stopTimer(2)" disabled>إرسال ⬆</button>
+        <button class="big-button send-button" id="sendBtn2" onclick="stopTimer(2)" disabled>إرسال <i data-lucide="send" class="btn-icon"></i></button>
       </div>
 
       <div class="input-section">
-        <label class="section-label">👆 هل الحاج مسجل له بصمة سابقًا؟</label>
+        <label class="section-label"><i data-lucide="fingerprint" class="section-icon"></i> هل الحاج مسجل له بصمة سابقًا؟</label>
         <div class="radio-card-group">
           <label class="radio-card">
             <input type="radio" name="fingerprint2" value="نعم">
@@ -136,19 +137,19 @@
       </div>
 
       <div class="input-section">
-        <label class="section-label">⏰ سبب التأخير (إن وجد)</label>
+        <label class="section-label"><i data-lucide="clock" class="section-icon"></i> سبب التأخير (إن وجد)</label>
         <input type="text" id="delayReason2" placeholder="اكتب سبب التأخير">
       </div>
 
       <div class="delay-extra">
-        <label class="section-label-sm">⚡ خيارات سريعة (اختياري)</label>
+        <label class="section-label-sm"><i data-lucide="zap" class="section-icon-sm"></i> خيارات سريعة (اختياري)</label>
         <label class="radio-card delay-card">
           <input type="radio" name="delayOption2" value="صعوبة قراءة البصمة">
-          <span>👆 صعوبة قراءة البصمة</span>
+          <span><i data-lucide="fingerprint" class="card-icon"></i> صعوبة قراءة البصمة</span>
         </label>
         <label class="radio-card delay-card">
           <input type="radio" name="delayOption2" value="التحقق من القوائم الأمنية">
-          <span>🛡 التحقق من القوائم الأمنية</span>
+          <span><i data-lucide="shield" class="card-icon"></i> التحقق من القوائم الأمنية</span>
         </label>
       </div>
     </div>
@@ -157,11 +158,11 @@
   <!-- ===== جدول السجل ===== -->
   <div class="table-card">
     <div class="table-header-row">
-      <span class="table-title">📋 سجل الحجاج</span>
+      <span class="table-title"><i data-lucide="clipboard-list" class="title-icon"></i> سجل الحجاج</span>
       <div class="table-actions">
-        <button class="action-btn" onclick="saveTableAsExcel()">Excel 📊</button>
+        <button class="action-btn" onclick="saveTableAsExcel()"><i data-lucide="download" class="btn-icon"></i> Excel</button>
         <input type="number" id="rowToDelete" placeholder="# رقم الصف" class="row-input">
-        <button class="action-btn danger" onclick="deleteRowByNumber()">حذف صف 🗑</button>
+        <button class="action-btn danger" onclick="deleteRowByNumber()"><i data-lucide="trash-2" class="btn-icon"></i> حذف صف</button>
       </div>
     </div>
 
@@ -218,38 +219,39 @@
 
   <!-- ===== ملخص الأداء ===== -->
   <div class="perf-summary">
-    <div class="perf-title">📊 ملخص الأداء</div>
+    <div class="perf-title"><i data-lucide="bar-chart-2" class="title-icon"></i> ملخص الأداء</div>
     <div class="metric-cards">
       <div class="metric-card">
-        <div class="metric-icon">👥</div>
+        <i data-lucide="users" class="metric-icon-svg"></i>
         <div class="metric-label">عدد الحجاج</div>
         <div class="metric-value" id="perfCount">0</div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon mc-clock">⏱</div>
+        <i data-lucide="clock" class="metric-icon-svg mc-clock"></i>
         <div class="metric-label">متوسط زمن (ث)</div>
         <div class="metric-value" id="perfAvg">0</div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon mc-down">↓</div>
+        <i data-lucide="arrow-down" class="metric-icon-svg mc-down"></i>
         <div class="metric-label">أدنى زمن (ث)</div>
         <div class="metric-value" id="perfMin">0</div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon mc-up">↑</div>
+        <i data-lucide="arrow-up" class="metric-icon-svg mc-up"></i>
         <div class="metric-label">أعلى زمن (ث)</div>
         <div class="metric-value" id="perfMax">0</div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon mc-pct">%</div>
+        <i data-lucide="percent" class="metric-icon-svg mc-pct"></i>
         <div class="metric-label">نسبة البصمة</div>
         <div class="metric-value" id="perfPercent">0%</div>
       </div>
     </div>
-    <div class="perf-footer">ℹ جميع الأوقات محسوبة بالثواني</div>
+    <div class="perf-footer"><i data-lucide="info" class="section-icon-sm"></i> جميع الأوقات محسوبة بالثواني</div>
   </div>
 </div>
 
 <script src="script.js"></script>
+<script>lucide.createIcons();</script>
 </body>
 </html>

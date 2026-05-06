@@ -65,6 +65,57 @@ body {
   object-fit: contain;
 }
 
+/* ═══════════════════════════════════════
+   Lucide Icons
+═══════════════════════════════════════ */
+.btn-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.title-icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.section-icon {
+  width: 17px;
+  height: 17px;
+  vertical-align: middle;
+  display: inline-block;
+  margin-left: 5px;
+  color: #555;
+}
+
+.section-icon-sm {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.card-icon {
+  width: 15px;
+  height: 15px;
+  vertical-align: middle;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.metric-icon-svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+  margin: 0 auto 6px;
+  color: #666;
+}
+
 .status-sep { margin: 0 6px; color: #bbb; }
 
 .change-btn {
@@ -446,9 +497,9 @@ tbody td, tfoot td, tfoot th {
 }
 
 .mc-clock { color: #2e7d32; }
-.mc-down  { color: #2e7d32; font-size: 20px; font-weight: 700; }
-.mc-up    { color: #1565c0; font-size: 20px; font-weight: 700; }
-.mc-pct   { color: #6a1b9a; font-size: 18px; font-weight: 700; }
+.mc-down  { color: #2e7d32; }
+.mc-up    { color: #1565c0; }
+.mc-pct   { color: #6a1b9a; }
 
 .metric-label {
   font-size: 11px;

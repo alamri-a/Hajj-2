@@ -82,7 +82,10 @@ function toggleTimer2() {
   const section = document.getElementById("timer2Section");
   const btn     = document.getElementById("toggleTimer2Btn");
   section.style.display = timer2Visible ? "block" : "none";
-  btn.textContent       = timer2Visible ? "－ إخفاء المؤقت الثاني" : "⏱ إظهار المؤقت الثاني";
+  btn.innerHTML = timer2Visible
+    ? '<i data-lucide="timer" class="btn-icon"></i> إخفاء المؤقت الثاني'
+    : '<i data-lucide="timer" class="btn-icon"></i> إظهار المؤقت الثاني';
+  if (typeof lucide !== "undefined") lucide.createIcons();
   localStorage.setItem("hajjTimer2Visible", timer2Visible ? "1" : "0");
 }
 
@@ -125,7 +128,9 @@ function startTimer(id) {
     btn.textContent = "■ موقوف";
     btn.className = "big-button stop-button";
     btn.disabled = true;
-    document.getElementById(`sendBtn${id}`).disabled = false;
+    const sendBtn = document.getElementById(`sendBtn${id}`);
+    sendBtn.disabled = false;
+    if (typeof lucide !== "undefined") lucide.createIcons();
   }
 }
 
@@ -186,7 +191,9 @@ function stopTimer(id) {
   btn.textContent = "▶ بدء";
   btn.className = "big-button start-button";
   btn.disabled = false;
+  document.getElementById(`sendBtn${id}`).innerHTML = 'إرسال <i data-lucide="send" class="btn-icon"></i>';
   document.getElementById(`sendBtn${id}`).disabled = true;
+  if (typeof lucide !== "undefined") lucide.createIcons();
 
   canUndo = true;
   document.querySelector("button.undo").disabled = false;
