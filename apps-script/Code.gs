@@ -43,9 +43,14 @@ function doPost(e) {
 
     if (action === "add") {
       const sheet = getOrCreateSheet(ss, sheetName);
-      clearStatsSection(sheet);
 
       const record = payload.record;
+
+      if (findRowById(sheet, record.recordId) !== -1) {
+        return jsonResponse({ status: "ok", message: "مكرر - تم تسجيله مسبقاً" });
+      }
+
+      clearStatsSection(sheet);
 
       const counter = getNextCounter(sheet, phase);
 
