@@ -61,6 +61,7 @@ function doPost(e) {
         ""
       ]);
 
+      SpreadsheetApp.flush();
       formatDataRows(sheet);
       refreshStats(sheet);
 
@@ -129,6 +130,7 @@ function doPost(e) {
 
 // ─────────────────────────────────────────
 // clearStatsSection — حذف دفعة واحدة
+// يعتمد على العمود A فقط: صفوف البيانات دائماً لها recordId، صفوف الإحصائيات فارغة
 // ─────────────────────────────────────────
 function clearStatsSection(sheet) {
   const lastRow = sheet.getLastRow();
@@ -136,20 +138,15 @@ function clearStatsSection(sheet) {
 
   const numRows = lastRow - 1;
   const col1 = sheet.getRange(2, 1, numRows, 1).getValues();
-  const col9 = sheet.getRange(2, 9, numRows, 1).getValues();
 
-  // إيجاد آخر صف بيانات حقيقي
   let lastDataRow = 1;
   for (let i = numRows - 1; i >= 0; i--) {
-    const recordId = String(col1[i][0]).trim();
-    const marker   = String(col9[i][0]).trim();
-    if (recordId !== "" && marker !== STATS_MARKER) {
-      lastDataRow = i + 2; // 1-based
+    if (String(col1[i][0]).trim() !== "") {
+      lastDataRow = i + 2;
       break;
     }
   }
 
-  // حذف كل ما بعد آخر صف بيانات دفعة واحدة
   const cutFrom = lastDataRow + 1;
   if (cutFrom <= lastRow) {
     sheet.deleteRows(cutFrom, lastRow - cutFrom + 1);
@@ -363,6 +360,11 @@ function normalizeTime(value) {
     if (!isNaN(d)) return Utilities.formatDate(d, Session.getScriptTimeZone(), "hh:mm a");
   }
   return text;
+}
+
+function fixStats() {
+  const ss = getOrCreateSpreadsheet();
+  ss.getSheets().forEach(sheet => { refreshStats(sheet); });
 }
 
 function jsonResponse(obj) {
