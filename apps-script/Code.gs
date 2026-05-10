@@ -149,7 +149,10 @@ function clearStatsSection(sheet) {
 
   const cutFrom = lastDataRow + 1;
   if (cutFrom <= lastRow) {
-    sheet.deleteRows(cutFrom, lastRow - cutFrom + 1);
+    const numToClear = lastRow - cutFrom + 1;
+    sheet.getRange(cutFrom, 1, numToClear, sheet.getMaxColumns())
+      .clearContent()
+      .clearFormat();
   }
 }
 
