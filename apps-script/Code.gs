@@ -178,6 +178,11 @@ function refreshStats(sheet) {
 
   let writeRow = sheet.getLastRow() + 2;
 
+  const rowsNeeded = writeRow + (phases.length * 6) + 4;
+  if (rowsNeeded > sheet.getMaxRows()) {
+    sheet.insertRowsAfter(sheet.getMaxRows(), rowsNeeded - sheet.getMaxRows());
+  }
+
   for (const phase of phases) {
     const phaseRows = dataRows.filter(r => String(r[7]).trim() === String(phase).trim());
 
