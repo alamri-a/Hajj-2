@@ -190,6 +190,7 @@ function refreshStats(sheet) {
 
     // عنوان المرحلة
     sheet.getRange(writeRow, 2, 1, 6)
+      .breakApart()
       .merge()
       .setValue("📊 ملخص إحصائي — " + phase)
       .setBackground("#1b5e20")
