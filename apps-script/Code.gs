@@ -227,7 +227,8 @@ function refreshStats(sheet) {
     sheet.getRange(writeRow, 2, statsData.length, 6)
       .setValues(statsData)
       .setBackground("#e8f5e9")
-      .setHorizontalAlignment("center");
+      .setHorizontalAlignment("center")
+      .setNumberFormat("0");
 
     sheet.getRange(writeRow + 2, 2, 1, 6)
       .setBackground("#c8e6c9")
