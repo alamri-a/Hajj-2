@@ -64,20 +64,14 @@ function doPost(e) {
       formatDataRows(sheet);
       refreshStats(sheet);
 
-      return jsonResponse({
-        status: "ok",
-        message: "تمت الإضافة"
-      });
+      return jsonResponse({ status: "ok", message: "تمت الإضافة" });
     }
 
     if (action === "delete") {
       const sheet = ss.getSheetByName(sheetName);
 
       if (!sheet) {
-        return jsonResponse({
-          status: "ok",
-          message: "not found"
-        });
+        return jsonResponse({ status: "ok", message: "not found" });
       }
 
       clearStatsSection(sheet);
@@ -86,10 +80,7 @@ function doPost(e) {
 
       if (rowIndex === -1) {
         refreshStats(sheet);
-        return jsonResponse({
-          status: "ok",
-          message: "not found"
-        });
+        return jsonResponse({ status: "ok", message: "not found" });
       }
 
       sheet.deleteRow(rowIndex);
@@ -97,20 +88,14 @@ function doPost(e) {
       formatDataRows(sheet);
       refreshStats(sheet);
 
-      return jsonResponse({
-        status: "ok",
-        message: "تم الحذف"
-      });
+      return jsonResponse({ status: "ok", message: "تم الحذف" });
     }
 
     if (action === "reset") {
       const sheet = ss.getSheetByName(sheetName);
 
       if (!sheet) {
-        return jsonResponse({
-          status: "ok",
-          message: "لا توجد بيانات"
-        });
+        return jsonResponse({ status: "ok", message: "لا توجد بيانات" });
       }
 
       clearStatsSection(sheet);
@@ -127,10 +112,7 @@ function doPost(e) {
       formatDataRows(sheet);
       refreshStats(sheet);
 
-      return jsonResponse({
-        status: "ok",
-        message: "تم المسح"
-      });
+      return jsonResponse({ status: "ok", message: "تم المسح" });
     }
 
     return jsonResponse({
@@ -139,17 +121,44 @@ function doPost(e) {
     });
 
   } catch (err) {
-    return jsonResponse({
-      status: "error",
-      message: err.toString()
-    });
+    return jsonResponse({ status: "error", message: err.toString() });
   } finally {
-    try {
-      lock.releaseLock();
-    } catch (e) {}
+    try { lock.releaseLock(); } catch (e) {}
   }
 }
 
+// ─────────────────────────────────────────
+// clearStatsSection — حذف دفعة واحدة
+// ─────────────────────────────────────────
+function clearStatsSection(sheet) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  const numRows = lastRow - 1;
+  const col1 = sheet.getRange(2, 1, numRows, 1).getValues();
+  const col9 = sheet.getRange(2, 9, numRows, 1).getValues();
+
+  // إيجاد آخر صف بيانات حقيقي
+  let lastDataRow = 1;
+  for (let i = numRows - 1; i >= 0; i--) {
+    const recordId = String(col1[i][0]).trim();
+    const marker   = String(col9[i][0]).trim();
+    if (recordId !== "" && marker !== STATS_MARKER) {
+      lastDataRow = i + 2; // 1-based
+      break;
+    }
+  }
+
+  // حذف كل ما بعد آخر صف بيانات دفعة واحدة
+  const cutFrom = lastDataRow + 1;
+  if (cutFrom <= lastRow) {
+    sheet.deleteRows(cutFrom, lastRow - cutFrom + 1);
+  }
+}
+
+// ─────────────────────────────────────────
+// refreshStats
+// ─────────────────────────────────────────
 function refreshStats(sheet) {
   clearStatsSection(sheet);
 
@@ -172,27 +181,17 @@ function refreshStats(sheet) {
   for (const phase of phases) {
     const phaseRows = dataRows.filter(r => String(r[7]).trim() === String(phase).trim());
 
-    const withBio = phaseRows
-      .filter(r => r[5] === "نعم")
-      .map(r => Number(r[4]))
-      .filter(n => !isNaN(n));
+    const withBio    = phaseRows.filter(r => r[5] === "نعم").map(r => Number(r[4])).filter(n => !isNaN(n));
+    const withoutBio = phaseRows.filter(r => r[5] === "لا").map(r => Number(r[4])).filter(n => !isNaN(n));
+    const allDur     = phaseRows.map(r => Number(r[4])).filter(n => !isNaN(n));
 
-    const withoutBio = phaseRows
-      .filter(r => r[5] === "لا")
-      .map(r => Number(r[4]))
-      .filter(n => !isNaN(n));
-
-    const allDur = phaseRows
-      .map(r => Number(r[4]))
-      .filter(n => !isNaN(n));
-
-    const avg = arr => arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
+    const avg     = arr => arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
     const safeMin = arr => arr.length ? Math.min(...arr) : 0;
     const safeMax = arr => arr.length ? Math.max(...arr) : 0;
-    const pct = (n, total) => total ? Math.round((n / total) * 100) + "%" : "0%";
+    const pct     = (n, total) => total ? Math.round((n / total) * 100) + "%" : "0%";
+    const total   = allDur.length;
 
-    const total = allDur.length;
-
+    // عنوان المرحلة
     sheet.getRange(writeRow, 2, 1, 6)
       .merge()
       .setValue("📊 ملخص إحصائي — " + phase)
@@ -201,51 +200,22 @@ function refreshStats(sheet) {
       .setFontWeight("bold")
       .setFontSize(12)
       .setHorizontalAlignment("center");
-
     sheet.getRange(writeRow, 9).setValue(STATS_MARKER);
     writeRow++;
 
+    // رؤوس الأعمدة
     sheet.getRange(writeRow, 2, 1, 6)
-      .setValues([[
-        "الفئة",
-        "عدد الحجاج",
-        "متوسط الزمن (ثانية)",
-        "الزمن الأدنى (ثانية)",
-        "الزمن الأعلى (ثانية)",
-        "النسبة من الإجمالي"
-      ]])
+      .setValues([["الفئة","عدد الحجاج","متوسط الزمن (ثانية)","الزمن الأدنى (ثانية)","الزمن الأعلى (ثانية)","النسبة من الإجمالي"]])
       .setBackground("#a5d6a7")
       .setFontWeight("bold")
       .setHorizontalAlignment("center");
-
     sheet.getRange(writeRow, 9).setValue(STATS_MARKER);
     writeRow++;
 
     const statsData = [
-      [
-        "المسجل لهم بصمة",
-        withBio.length,
-        avg(withBio),
-        safeMin(withBio),
-        safeMax(withBio),
-        pct(withBio.length, total)
-      ],
-      [
-        "غير المسجل لهم بصمة",
-        withoutBio.length,
-        avg(withoutBio),
-        safeMin(withoutBio),
-        safeMax(withoutBio),
-        pct(withoutBio.length, total)
-      ],
-      [
-        "الإجمالي",
-        total,
-        avg(allDur),
-        safeMin(allDur),
-        safeMax(allDur),
-        "—"
-      ]
+      ["المسجل لهم بصمة",    withBio.length,    avg(withBio),    safeMin(withBio),    safeMax(withBio),    pct(withBio.length, total)],
+      ["غير المسجل لهم بصمة", withoutBio.length, avg(withoutBio), safeMin(withoutBio), safeMax(withoutBio), pct(withoutBio.length, total)],
+      ["الإجمالي",             total,             avg(allDur),     safeMin(allDur),     safeMax(allDur),     "—"]
     ];
 
     sheet.getRange(writeRow, 2, statsData.length, 6)
@@ -257,120 +227,106 @@ function refreshStats(sheet) {
       .setBackground("#c8e6c9")
       .setFontWeight("bold");
 
-    for (let r = 0; r < statsData.length; r++) {
-      sheet.getRange(writeRow + r, 9).setValue(STATS_MARKER);
-    }
+    // كتابة STATS_MARKER للصفوف الثلاثة دفعة واحدة
+    sheet.getRange(writeRow, 9, statsData.length, 1)
+      .setValues(statsData.map(() => [STATS_MARKER]));
 
     writeRow += statsData.length + 1;
   }
 
   formatHeader(sheet);
   formatDataRows(sheet);
-  autoResize(sheet);
 }
 
-function clearStatsSection(sheet) {
+// ─────────────────────────────────────────
+// formatDataRows — تنسيق دفعة واحدة
+// ─────────────────────────────────────────
+function formatDataRows(sheet) {
   const lastRow = sheet.getLastRow();
-
   if (lastRow < 2) return;
 
-  const values = sheet.getRange(1, 1, lastRow, 9).getValues();
+  const numRows = lastRow - 1;
+  const col1 = sheet.getRange(2, 1, numRows, 1).getValues();
+  const col9 = sheet.getRange(2, 9, numRows, 1).getValues();
 
-  for (let i = values.length; i >= 2; i--) {
-    if (String(values[i - 1][8]).trim() === STATS_MARKER) {
-      sheet.deleteRow(i);
+  // إيجاد آخر صف بيانات حقيقي
+  let lastDataRow = 1;
+  for (let i = numRows - 1; i >= 0; i--) {
+    if (String(col1[i][0]).trim() !== "" && String(col9[i][0]).trim() !== STATS_MARKER) {
+      lastDataRow = i + 2;
+      break;
     }
   }
 
-  const newLastRow = sheet.getLastRow();
+  if (lastDataRow < 2) return;
 
-  for (let r = newLastRow; r >= 2; r--) {
-    const row = sheet.getRange(r, 1, 1, 9).getValues()[0];
-    const isEmpty = row.every(c => String(c).trim() === "");
+  // تنسيق كل صفوف البيانات دفعة واحدة
+  sheet.getRange(2, 1, lastDataRow - 1, 9)
+    .setBackground(null)
+    .setFontColor("black")
+    .setFontWeight("normal")
+    .setHorizontalAlignment("center");
+}
 
-    if (isEmpty) {
-      sheet.deleteRow(r);
-    }
-  }
+// ─────────────────────────────────────────
+// resequenceCounters — كتابة دفعة واحدة
+// ─────────────────────────────────────────
+function resequenceCounters(sheet) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
+  const countersByPhase = {};
+
+  const col2Values = data.map(row => {
+    const recordId = String(row[0]).trim();
+    const marker   = String(row[8]).trim();
+
+    if (recordId === "" || marker === STATS_MARKER) return [row[1]];
+
+    const phase = String(row[7]).trim() || "غير محدد";
+    if (!countersByPhase[phase]) countersByPhase[phase] = 0;
+    countersByPhase[phase]++;
+    return [countersByPhase[phase]];
+  });
+
+  sheet.getRange(2, 2, col2Values.length, 1).setValues(col2Values);
 }
 
 function getNextCounter(sheet, phase) {
   const data = sheet.getDataRange().getValues();
-
   const phaseRows = data.slice(1).filter(row =>
     String(row[0]).trim() !== "" &&
     String(row[7]).trim() === String(phase).trim() &&
     String(row[8]).trim() !== STATS_MARKER
   );
-
   return phaseRows.length + 1;
-}
-
-function resequenceCounters(sheet) {
-  const lastRow = sheet.getLastRow();
-
-  if (lastRow < 2) return;
-
-  const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
-
-  const countersByPhase = {};
-
-  for (let i = 0; i < data.length; i++) {
-    const row = data[i];
-
-    if (String(row[0]).trim() === "") continue;
-    if (String(row[8]).trim() === STATS_MARKER) continue;
-
-    const phase = String(row[7]).trim() || "غير محدد";
-
-    if (!countersByPhase[phase]) countersByPhase[phase] = 0;
-
-    countersByPhase[phase]++;
-
-    sheet.getRange(i + 2, 2).setValue(countersByPhase[phase]);
-  }
 }
 
 function findRowById(sheet, recordId) {
   const data = sheet.getDataRange().getValues();
-
   for (let i = 1; i < data.length; i++) {
     if (String(data[i][8]).trim() === STATS_MARKER) continue;
-
-    if (String(data[i][0]).trim() === String(recordId).trim()) {
-      return i + 1;
-    }
+    if (String(data[i][0]).trim() === String(recordId).trim()) return i + 1;
   }
-
   return -1;
 }
 
 function getOrCreateSpreadsheet() {
   const files = DriveApp.getFilesByName(SPREADSHEET_NAME);
-
-  if (files.hasNext()) {
-    return SpreadsheetApp.open(files.next());
-  }
-
+  if (files.hasNext()) return SpreadsheetApp.open(files.next());
   return SpreadsheetApp.create(SPREADSHEET_NAME);
 }
 
 function getOrCreateSheet(ss, sheetName) {
   let sheet = ss.getSheetByName(sheetName);
-
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(HEADERS);
     sheet.setFrozenRows(1);
   }
-
   formatHeader(sheet);
-
-  try {
-    sheet.hideColumns(1);
-    sheet.hideColumns(9);
-  } catch (e) {}
-
+  try { sheet.hideColumns(1); sheet.hideColumns(9); } catch (e) {}
   return sheet;
 }
 
@@ -380,79 +336,32 @@ function formatHeader(sheet) {
     .setFontWeight("bold")
     .setBackground("#c8e6c9")
     .setHorizontalAlignment("center");
-
   sheet.setFrozenRows(1);
 }
 
-function formatDataRows(sheet) {
-  const lastRow = sheet.getLastRow();
-
-  if (lastRow < 2) return;
-
-  const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
-
-  for (let i = 0; i < data.length; i++) {
-    const rowNumber = i + 2;
-    const marker = String(data[i][8]).trim();
-    const recordId = String(data[i][0]).trim();
-
-    if (marker === STATS_MARKER || recordId === "") continue;
-
-    sheet.getRange(rowNumber, 1, 1, 9)
-      .setBackground(null)
-      .setFontColor("black")
-      .setFontWeight("normal")
-      .setHorizontalAlignment("center");
-  }
-}
-
-function autoResize(sheet) {
-  try {
-    sheet.autoResizeColumns(2, 7);
-  } catch (e) {}
-}
-
 function sanitizeSheetName(name) {
-  return String(name)
-    .replace(/[\/\\?\*\[\]':]/g, "_")
-    .substring(0, 100);
+  return String(name).replace(/[\/\\?\*\[\]':]/g, "_").substring(0, 100);
 }
 
 function normalizeDate(value) {
   if (!value) return "";
-
-  if (value instanceof Date) {
-    return Utilities.formatDate(value, Session.getScriptTimeZone(), "dd/MM/yyyy");
-  }
-
+  if (value instanceof Date) return Utilities.formatDate(value, Session.getScriptTimeZone(), "dd/MM/yyyy");
   const text = String(value);
-
   if (text.includes("T")) {
     const d = new Date(text);
-    if (!isNaN(d)) {
-      return Utilities.formatDate(d, Session.getScriptTimeZone(), "dd/MM/yyyy");
-    }
+    if (!isNaN(d)) return Utilities.formatDate(d, Session.getScriptTimeZone(), "dd/MM/yyyy");
   }
-
   return text;
 }
 
 function normalizeTime(value) {
   if (!value) return "";
-
-  if (value instanceof Date) {
-    return Utilities.formatDate(value, Session.getScriptTimeZone(), "hh:mm a");
-  }
-
+  if (value instanceof Date) return Utilities.formatDate(value, Session.getScriptTimeZone(), "hh:mm a");
   const text = String(value);
-
   if (text.includes("T")) {
     const d = new Date(text);
-    if (!isNaN(d)) {
-      return Utilities.formatDate(d, Session.getScriptTimeZone(), "hh:mm a");
-    }
+    if (!isNaN(d)) return Utilities.formatDate(d, Session.getScriptTimeZone(), "hh:mm a");
   }
-
   return text;
 }
 
