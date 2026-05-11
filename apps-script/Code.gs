@@ -47,6 +47,10 @@ function doPost(e) {
 
       const record = payload.record;
 
+      if (findRowById(sheet, record.recordId) !== -1) {
+        return jsonResponse({ status: "ok", message: "مكرر - تم تسجيله مسبقاً" });
+      }
+
       const counter = getNextCounter(sheet, phase);
 
       sheet.appendRow([
