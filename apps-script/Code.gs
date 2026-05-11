@@ -382,6 +382,49 @@ function fixStats() {
   ss.getSheets().forEach(sheet => { refreshStats(sheet); });
 }
 
+function removeDuplicates() {
+  const ss = getOrCreateSpreadsheet();
+  let totalRemoved = 0;
+
+  ss.getSheets().forEach(sheet => {
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+
+    const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
+    const seen = new Set();
+    const rowsToDelete = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const recordId = String(data[i][0]).trim();
+      const marker   = String(data[i][8]).trim();
+
+      if (recordId === "" || marker === STATS_MARKER) continue;
+
+      if (seen.has(recordId)) {
+        rowsToDelete.push(i + 2);
+      } else {
+        seen.add(recordId);
+      }
+    }
+
+    for (let i = rowsToDelete.length - 1; i >= 0; i--) {
+      sheet.deleteRow(rowsToDelete[i]);
+    }
+
+    totalRemoved += rowsToDelete.length;
+
+    if (rowsToDelete.length > 0) {
+      resequenceCounters(sheet);
+      formatDataRows(sheet);
+      refreshStats(sheet);
+    }
+
+    Logger.log(sheet.getName() + ': حُذف ' + rowsToDelete.length + ' تكرار');
+  });
+
+  Logger.log('المجموع: ' + totalRemoved + ' صف مكرر محذوف');
+}
+
 function jsonResponse(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
