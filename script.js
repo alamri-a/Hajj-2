@@ -34,8 +34,8 @@ function saveSetupChoice() {
     return;
   }
 
-  // إذا تغيّر المنفذ أو المرحلة امسح البيانات المحلية
-  if (checkpoint !== currentCheckpoint || phase !== currentPhase) {
+  // إذا تغيّر المنفذ أو المرحلة امسح البيانات المحلية (للمنافذ العادية فقط)
+  if (checkpoint !== "__summary__" && (checkpoint !== currentCheckpoint || phase !== currentPhase)) {
     document.querySelector("#logTable tbody").innerHTML = "";
     allDurations       = [];
     withBiometric      = [];
@@ -51,11 +51,50 @@ function saveSetupChoice() {
 
   document.getElementById("setupModal").style.display = "none";
   updateStatusBar();
+
+  if (checkpoint === "__summary__") {
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("summaryView").style.display = "block";
+    loadSummaryData(phase);
+    return;
+  }
+
+  document.getElementById("mainContent").style.display = "";
+  document.getElementById("summaryView").style.display = "none";
   loadFromLocalStorage();
 }
 
+async function loadSummaryData(phase) {
+  const ids = ["sc-total","sc-avg","sc-min","sc-max","sc-bio"];
+  document.getElementById("summaryPhaseLabel").textContent = "المرحلة: " + phase;
+  ids.forEach(id => { document.getElementById(id).textContent = "..."; });
+
+  if (API_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
+    ids.forEach(id => { document.getElementById(id).textContent = "—"; });
+    return;
+  }
+
+  try {
+    const res  = await fetch(API_URL + "?action=getSummary&phase=" + encodeURIComponent(phase));
+    const json = await res.json();
+    if (json.status === "ok" && json.data) {
+      const d = json.data;
+      document.getElementById("sc-total").textContent = d.total;
+      document.getElementById("sc-avg").textContent   = d.avg;
+      document.getElementById("sc-min").textContent   = d.min;
+      document.getElementById("sc-max").textContent   = d.max;
+      document.getElementById("sc-bio").textContent   = d.bioPct;
+    } else {
+      ids.forEach(id => { document.getElementById(id).textContent = "خطأ"; });
+    }
+  } catch(err) {
+    ids.forEach(id => { document.getElementById(id).textContent = "خطأ"; });
+  }
+}
+
 function updateStatusBar() {
-  document.getElementById("statusCheckpoint").textContent = currentCheckpoint;
+  const label = currentCheckpoint === "__summary__" ? "ملخص الأداء" : currentCheckpoint;
+  document.getElementById("statusCheckpoint").textContent = label;
   document.getElementById("statusPhase").textContent      = currentPhase;
   document.getElementById("statusBar").style.display      = "flex";
 }
@@ -429,7 +468,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (savedCheckpoint && savedPhase) {
     currentCheckpoint = savedCheckpoint;
     currentPhase      = savedPhase;
-    // تحديث قيم الـ modal لتعكس الاختيار المحفوظ
     const selectEl = document.getElementById("checkpointSelect");
     const isKnown  = Array.from(selectEl.options).some(o => o.value === savedCheckpoint);
     if (isKnown) {
@@ -442,9 +480,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("setupModal").style.display = "none";
     updateStatusBar();
-    loadFromLocalStorage();
-    processPendingQueue();
-    processPendingDeleteQueue();
+
+    if (savedCheckpoint === "__summary__") {
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("summaryView").style.display = "block";
+      loadSummaryData(savedPhase);
+    } else {
+      loadFromLocalStorage();
+      processPendingQueue();
+      processPendingDeleteQueue();
+    }
   } else {
     document.getElementById("setupModal").style.display = "flex";
   }

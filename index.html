@@ -19,6 +19,7 @@
       <option value="مطار الملك عبدالعزيز">مطار الملك عبدالعزيز</option>
       <option value="مطار المدينة المنورة">مطار المدينة المنورة</option>
       <option value="حالة عمار">حالة عمار</option>
+      <option value="__summary__">📊 ملخص الأداء</option>
     </select>
 
     <div class="modal-custom">
@@ -43,6 +44,43 @@
   <span>المرحلة: <strong id="statusPhase">-</strong></span>
   <button class="change-btn" onclick="showSetupModal()">⚙ تغيير</button>
 </div>
+
+<!-- ===== ملخص الأداء الإجمالي ===== -->
+<div id="summaryView" style="display:none; padding: 20px;">
+  <h2 class="summary-title">📊 ملخص الأداء الإجمالي</h2>
+  <p id="summaryPhaseLabel" class="summary-phase"></p>
+  <div class="summary-cards">
+    <div class="stat-card">
+      <span class="stat-icon stat-icon-people">👥</span>
+      <span class="stat-label">عدد الحجاج</span>
+      <span class="stat-value" id="sc-total">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon stat-icon-avg">⏱</span>
+      <span class="stat-label">متوسط زمن (ث)</span>
+      <span class="stat-value" id="sc-avg">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon stat-icon-min">↓</span>
+      <span class="stat-label">أدنى زمن (ث)</span>
+      <span class="stat-value" id="sc-min">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon stat-icon-max">↑</span>
+      <span class="stat-label">أعلى زمن (ث)</span>
+      <span class="stat-value" id="sc-max">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon stat-icon-bio">%</span>
+      <span class="stat-label">نسبة البصمة</span>
+      <span class="stat-value" id="sc-bio">—</span>
+    </div>
+  </div>
+  <p class="summary-note">ⓘ جميع الأوقات محسوبة بالثواني</p>
+</div>
+
+<!-- ===== المحتوى الرئيسي ===== -->
+<div id="mainContent">
 
 <!-- ===== أزرار التحكم العامة ===== -->
 <div style="text-align: center; margin-top: 20px;">
@@ -177,6 +215,8 @@
     </tr>
   </tfoot>
 </table>
+
+</div><!-- /mainContent -->
 
 <script src="script.js"></script>
 </body>

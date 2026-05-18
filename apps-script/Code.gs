@@ -14,6 +14,39 @@ const HEADERS = [
 ];
 
 function doGet(e) {
+  const action = e.parameter && e.parameter.action;
+  const phase  = e.parameter && e.parameter.phase;
+
+  if (action === "getSummary" && phase) {
+    const ss = getOrCreateSpreadsheet();
+    const allDur = [], withBio = [];
+
+    ss.getSheets().forEach(function(sheet) {
+      sheet.getDataRange().getValues().slice(1).forEach(function(row) {
+        if (String(row[0]).trim() === "" || String(row[8]).trim() === STATS_MARKER) return;
+        if (String(row[7]).trim() !== String(phase).trim()) return;
+        const dur = Number(row[4]);
+        if (!isNaN(dur) && dur > 0) {
+          allDur.push(dur);
+          if (row[5] === "نعم") withBio.push(dur);
+        }
+      });
+    });
+
+    const total = allDur.length;
+    const avg   = total ? Math.round(allDur.reduce(function(a,b){return a+b;},0)/total) : 0;
+    return jsonResponse({
+      status: "ok",
+      data: {
+        total:  total,
+        avg:    avg,
+        min:    total ? Math.min.apply(null, allDur) : 0,
+        max:    total ? Math.max.apply(null, allDur) : 0,
+        bioPct: total ? Math.round((withBio.length/total)*100)+"%" : "0%"
+      }
+    });
+  }
+
   return jsonResponse({
     status: "ok",
     message: "Google Sheet API is working. Site should use local data only for display."
