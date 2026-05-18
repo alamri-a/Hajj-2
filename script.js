@@ -91,7 +91,6 @@ async function loadSummaryData(phase) {
   const allIds = ["sc-total","sc-bio-with-pct","sc-bio-without-pct",
                   "sc-with-avg","sc-with-max","sc-with-min",
                   "sc-without-avg","sc-without-max","sc-without-min"];
-  document.getElementById("summaryPhaseLabel").textContent = "المرحلة: " + phase;
   allIds.forEach(id => { document.getElementById(id).textContent = "..."; });
 
   if (API_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
