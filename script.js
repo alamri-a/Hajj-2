@@ -79,19 +79,23 @@ function resetFingerprint(id) {
 }
 
 function updateStatusBar() {
-  const label = currentCheckpoint === "__summary__" ? "ملخص الأداء" : currentCheckpoint;
-  document.getElementById("statusCheckpoint").textContent = label;
+  const isSummary = currentCheckpoint === "__summary__";
+  document.getElementById("statusCheckpoint").textContent = currentCheckpoint;
   document.getElementById("statusPhase").textContent      = currentPhase;
   document.getElementById("statusBar").style.display      = "flex";
+  document.getElementById("statusCheckpointWrap").style.display = isSummary ? "none" : "";
+  document.getElementById("statusSep").style.display             = isSummary ? "none" : "";
 }
 
 async function loadSummaryData(phase) {
-  const ids = ["sc-total","sc-avg","sc-min","sc-max","sc-bio"];
+  const allIds = ["sc-total","sc-bio-with-pct","sc-bio-without-pct",
+                  "sc-with-avg","sc-with-max","sc-with-min",
+                  "sc-without-avg","sc-without-max","sc-without-min"];
   document.getElementById("summaryPhaseLabel").textContent = "المرحلة: " + phase;
-  ids.forEach(id => { document.getElementById(id).textContent = "..."; });
+  allIds.forEach(id => { document.getElementById(id).textContent = "..."; });
 
   if (API_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
-    ids.forEach(id => { document.getElementById(id).textContent = "—"; });
+    allIds.forEach(id => { document.getElementById(id).textContent = "—"; });
     return;
   }
 
@@ -100,16 +104,20 @@ async function loadSummaryData(phase) {
     const json = await res.json();
     if (json.status === "ok" && json.data) {
       const d = json.data;
-      document.getElementById("sc-total").textContent = d.total;
-      document.getElementById("sc-avg").textContent   = d.avg;
-      document.getElementById("sc-min").textContent   = d.min;
-      document.getElementById("sc-max").textContent   = d.max;
-      document.getElementById("sc-bio").textContent   = d.bioPct;
+      document.getElementById("sc-total").textContent          = d.total;
+      document.getElementById("sc-bio-with-pct").textContent   = d.withBioPct;
+      document.getElementById("sc-bio-without-pct").textContent= d.withoutBioPct;
+      document.getElementById("sc-with-avg").textContent       = d.withBio.avg;
+      document.getElementById("sc-with-max").textContent       = d.withBio.max;
+      document.getElementById("sc-with-min").textContent       = d.withBio.min;
+      document.getElementById("sc-without-avg").textContent    = d.withoutBio.avg;
+      document.getElementById("sc-without-max").textContent    = d.withoutBio.max;
+      document.getElementById("sc-without-min").textContent    = d.withoutBio.min;
     } else {
-      ids.forEach(id => { document.getElementById(id).textContent = "خطأ"; });
+      allIds.forEach(id => { document.getElementById(id).textContent = "خطأ"; });
     }
   } catch(err) {
-    ids.forEach(id => { document.getElementById(id).textContent = "خطأ"; });
+    allIds.forEach(id => { document.getElementById(id).textContent = "خطأ"; });
   }
 }
 

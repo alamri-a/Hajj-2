@@ -44,8 +44,8 @@
 <div id="statusBar" class="status-bar" style="display:none">
   <button class="change-btn" onclick="showSetupModal()">تغيير <i data-lucide="settings" class="btn-icon"></i></button>
   <div class="status-info">
-    <span>المنفذ: <strong id="statusCheckpoint">-</strong></span>
-    <span class="status-sep">|</span>
+    <span id="statusCheckpointWrap">المنفذ: <strong id="statusCheckpoint">-</strong></span>
+    <span class="status-sep" id="statusSep">|</span>
     <span>المرحلة: <strong id="statusPhase">-</strong></span>
   </div>
   <img src="Passports1.PNG" class="status-logo" alt="الجوازات">
@@ -56,6 +56,7 @@
   <div class="perf-summary">
     <div class="perf-title"><i data-lucide="bar-chart-2" class="title-icon"></i> ملخص الأداء الإجمالي — جميع المنافذ</div>
     <p id="summaryPhaseLabel" style="color:#666; font-size:15px; margin-bottom:18px;"></p>
+
     <div class="metric-cards">
       <div class="metric-card">
         <i data-lucide="users" class="metric-icon-svg"></i>
@@ -63,26 +64,55 @@
         <div class="metric-value" id="sc-total">—</div>
       </div>
       <div class="metric-card">
-        <i data-lucide="clock" class="metric-icon-svg mc-clock"></i>
-        <div class="metric-label">متوسط زمن (ث)</div>
-        <div class="metric-value" id="sc-avg">—</div>
+        <i data-lucide="percent" class="metric-icon-svg mc-pct"></i>
+        <div class="metric-label">نسبة المسجل لهم بصمة مسبقاً</div>
+        <div class="metric-value" id="sc-bio-with-pct">—</div>
       </div>
       <div class="metric-card">
-        <i data-lucide="arrow-down" class="metric-icon-svg mc-down"></i>
-        <div class="metric-label">أدنى زمن (ث)</div>
-        <div class="metric-value" id="sc-min">—</div>
+        <i data-lucide="percent" class="metric-icon-svg"></i>
+        <div class="metric-label">نسبة الغير مسجل لهم بصمة مسبقاً</div>
+        <div class="metric-value" id="sc-bio-without-pct">—</div>
+      </div>
+    </div>
+
+    <div class="summary-section-title">المسجل لهم خصائص حيوية مسبقاً</div>
+    <div class="metric-cards">
+      <div class="metric-card">
+        <i data-lucide="clock" class="metric-icon-svg mc-clock"></i>
+        <div class="metric-label">متوسط الزمن (ث)</div>
+        <div class="metric-value" id="sc-with-avg">—</div>
       </div>
       <div class="metric-card">
         <i data-lucide="arrow-up" class="metric-icon-svg mc-up"></i>
         <div class="metric-label">أعلى زمن (ث)</div>
-        <div class="metric-value" id="sc-max">—</div>
+        <div class="metric-value" id="sc-with-max">—</div>
       </div>
       <div class="metric-card">
-        <i data-lucide="percent" class="metric-icon-svg mc-pct"></i>
-        <div class="metric-label">نسبة البصمة المسجلة مسبقاً</div>
-        <div class="metric-value" id="sc-bio">—</div>
+        <i data-lucide="arrow-down" class="metric-icon-svg mc-down"></i>
+        <div class="metric-label">أدنى زمن (ث)</div>
+        <div class="metric-value" id="sc-with-min">—</div>
       </div>
     </div>
+
+    <div class="summary-section-title">الغير مسجل لهم خصائص حيوية مسبقاً</div>
+    <div class="metric-cards">
+      <div class="metric-card">
+        <i data-lucide="clock" class="metric-icon-svg mc-clock"></i>
+        <div class="metric-label">متوسط الزمن (ث)</div>
+        <div class="metric-value" id="sc-without-avg">—</div>
+      </div>
+      <div class="metric-card">
+        <i data-lucide="arrow-up" class="metric-icon-svg mc-up"></i>
+        <div class="metric-label">أعلى زمن (ث)</div>
+        <div class="metric-value" id="sc-without-max">—</div>
+      </div>
+      <div class="metric-card">
+        <i data-lucide="arrow-down" class="metric-icon-svg mc-down"></i>
+        <div class="metric-label">أدنى زمن (ث)</div>
+        <div class="metric-value" id="sc-without-min">—</div>
+      </div>
+    </div>
+
     <div class="perf-footer"><i data-lucide="info" class="section-icon-sm"></i> جميع المنافذ مجمعة · يتحدث بإعادة التحميل</div>
   </div>
 </div>

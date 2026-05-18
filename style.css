@@ -541,6 +541,23 @@ tfoot tr:last-child td { border-bottom: none; }
 }
 
 /* ═══════════════════════════════════════
+   ملخص الأداء الإجمالي — تنسيق خاص
+═══════════════════════════════════════ */
+.summary-section-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #1b5e20;
+  margin: 22px 0 10px;
+  padding: 6px 0;
+  border-bottom: 2px solid #c8e6c9;
+}
+
+#summaryView .metric-cards {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* ═══════════════════════════════════════
    Modal
 ═══════════════════════════════════════ */
 .modal-overlay {
