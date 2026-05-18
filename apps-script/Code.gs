@@ -19,30 +19,37 @@ function doGet(e) {
 
   if (action === "getSummary" && phase) {
     const ss = getOrCreateSpreadsheet();
-    const allDur = [], withBio = [];
+    const withBioDur = [], withoutBioDur = [];
 
     ss.getSheets().forEach(function(sheet) {
       sheet.getDataRange().getValues().slice(1).forEach(function(row) {
         if (String(row[0]).trim() === "" || String(row[8]).trim() === STATS_MARKER) return;
         if (String(row[7]).trim() !== String(phase).trim()) return;
         const dur = Number(row[4]);
-        if (!isNaN(dur) && dur > 0) {
-          allDur.push(dur);
-          if (row[5] === "نعم") withBio.push(dur);
-        }
+        if (isNaN(dur) || dur <= 0) return;
+        if (row[5] === "نعم") withBioDur.push(dur);
+        else withoutBioDur.push(dur);
       });
     });
 
-    const total = allDur.length;
-    const avg   = total ? Math.round(allDur.reduce(function(a,b){return a+b;},0)/total) : 0;
+    function stats(arr) {
+      if (!arr.length) return { avg: 0, min: 0, max: 0 };
+      return {
+        avg: Math.round(arr.reduce(function(a,b){return a+b;},0) / arr.length),
+        min: Math.min.apply(null, arr),
+        max: Math.max.apply(null, arr)
+      };
+    }
+
+    const total = withBioDur.length + withoutBioDur.length;
     return jsonResponse({
       status: "ok",
       data: {
-        total:  total,
-        avg:    avg,
-        min:    total ? Math.min.apply(null, allDur) : 0,
-        max:    total ? Math.max.apply(null, allDur) : 0,
-        bioPct: total ? Math.round((withBio.length/total)*100)+"%" : "0%"
+        total:         total,
+        withBioPct:    total ? Math.round((withBioDur.length / total) * 100) + "%" : "0%",
+        withoutBioPct: total ? Math.round((withoutBioDur.length / total) * 100) + "%" : "0%",
+        withBio:       stats(withBioDur),
+        withoutBio:    stats(withoutBioDur)
       }
     });
   }
