@@ -14,6 +14,39 @@ const HEADERS = [
 ];
 
 function doGet(e) {
+  const action = e.parameter && e.parameter.action;
+  const phase  = e.parameter && e.parameter.phase;
+
+  if (action === "getSummary" && phase) {
+    const ss = getOrCreateSpreadsheet();
+    const allDur = [], withBio = [];
+
+    ss.getSheets().forEach(function(sheet) {
+      sheet.getDataRange().getValues().slice(1).forEach(function(row) {
+        if (String(row[0]).trim() === "" || String(row[8]).trim() === STATS_MARKER) return;
+        if (String(row[7]).trim() !== String(phase).trim()) return;
+        const dur = Number(row[4]);
+        if (!isNaN(dur) && dur > 0) {
+          allDur.push(dur);
+          if (row[5] === "نعم") withBio.push(dur);
+        }
+      });
+    });
+
+    const total = allDur.length;
+    const avg   = total ? Math.round(allDur.reduce(function(a,b){return a+b;},0)/total) : 0;
+    return jsonResponse({
+      status: "ok",
+      data: {
+        total:  total,
+        avg:    avg,
+        min:    total ? Math.min.apply(null, allDur) : 0,
+        max:    total ? Math.max.apply(null, allDur) : 0,
+        bioPct: total ? Math.round((withBio.length/total)*100)+"%" : "0%"
+      }
+    });
+  }
+
   return jsonResponse({
     status: "ok",
     message: "Google Sheet API is working. Site should use local data only for display."
@@ -43,14 +76,13 @@ function doPost(e) {
 
     if (action === "add") {
       const sheet = getOrCreateSheet(ss, sheetName);
+      clearStatsSection(sheet);
 
       const record = payload.record;
 
       if (findRowById(sheet, record.recordId) !== -1) {
         return jsonResponse({ status: "ok", message: "مكرر - تم تسجيله مسبقاً" });
       }
-
-      clearStatsSection(sheet);
 
       const counter = getNextCounter(sheet, phase);
 
@@ -66,23 +98,18 @@ function doPost(e) {
         ""
       ]);
 
+      SpreadsheetApp.flush();
       formatDataRows(sheet);
       refreshStats(sheet);
 
-      return jsonResponse({
-        status: "ok",
-        message: "تمت الإضافة"
-      });
+      return jsonResponse({ status: "ok", message: "تمت الإضافة" });
     }
 
     if (action === "delete") {
       const sheet = ss.getSheetByName(sheetName);
 
       if (!sheet) {
-        return jsonResponse({
-          status: "ok",
-          message: "not found"
-        });
+        return jsonResponse({ status: "ok", message: "not found" });
       }
 
       clearStatsSection(sheet);
@@ -91,10 +118,7 @@ function doPost(e) {
 
       if (rowIndex === -1) {
         refreshStats(sheet);
-        return jsonResponse({
-          status: "ok",
-          message: "not found"
-        });
+        return jsonResponse({ status: "ok", message: "not found" });
       }
 
       sheet.deleteRow(rowIndex);
@@ -102,20 +126,14 @@ function doPost(e) {
       formatDataRows(sheet);
       refreshStats(sheet);
 
-      return jsonResponse({
-        status: "ok",
-        message: "تم الحذف"
-      });
+      return jsonResponse({ status: "ok", message: "تم الحذف" });
     }
 
     if (action === "reset") {
       const sheet = ss.getSheetByName(sheetName);
 
       if (!sheet) {
-        return jsonResponse({
-          status: "ok",
-          message: "لا توجد بيانات"
-        });
+        return jsonResponse({ status: "ok", message: "لا توجد بيانات" });
       }
 
       clearStatsSection(sheet);
@@ -132,10 +150,7 @@ function doPost(e) {
       formatDataRows(sheet);
       refreshStats(sheet);
 
-      return jsonResponse({
-        status: "ok",
-        message: "تم المسح"
-      });
+      return jsonResponse({ status: "ok", message: "تم المسح" });
     }
 
     return jsonResponse({
@@ -144,14 +159,33 @@ function doPost(e) {
     });
 
   } catch (err) {
-    return jsonResponse({
-      status: "error",
-      message: err.toString()
-    });
+    return jsonResponse({ status: "error", message: err.toString() });
   } finally {
-    try {
-      lock.releaseLock();
-    } catch (e) {}
+    try { lock.releaseLock(); } catch (e) {}
+  }
+}
+
+function clearStatsSection(sheet) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  const numRows = lastRow - 1;
+  const col1 = sheet.getRange(2, 1, numRows, 1).getValues();
+
+  let lastDataRow = 1;
+  for (let i = numRows - 1; i >= 0; i--) {
+    if (String(col1[i][0]).trim() !== "") {
+      lastDataRow = i + 2;
+      break;
+    }
+  }
+
+  const cutFrom = lastDataRow + 1;
+  if (cutFrom <= lastRow) {
+    const numToClear = lastRow - cutFrom + 1;
+    sheet.getRange(cutFrom, 1, numToClear, sheet.getMaxColumns())
+      .clearContent()
+      .clearFormat();
   }
 }
 
@@ -174,31 +208,26 @@ function refreshStats(sheet) {
 
   let writeRow = sheet.getLastRow() + 2;
 
+  const rowsNeeded = writeRow + (phases.length * 6) + 4;
+  if (rowsNeeded > sheet.getMaxRows()) {
+    sheet.insertRowsAfter(sheet.getMaxRows(), rowsNeeded - sheet.getMaxRows());
+  }
+
   for (const phase of phases) {
     const phaseRows = dataRows.filter(r => String(r[7]).trim() === String(phase).trim());
 
-    const withBio = phaseRows
-      .filter(r => r[5] === "نعم")
-      .map(r => Number(r[4]))
-      .filter(n => !isNaN(n));
+    const withBio    = phaseRows.filter(r => r[5] === "نعم").map(r => Number(r[4])).filter(n => !isNaN(n));
+    const withoutBio = phaseRows.filter(r => r[5] === "لا").map(r => Number(r[4])).filter(n => !isNaN(n));
+    const allDur     = phaseRows.map(r => Number(r[4])).filter(n => !isNaN(n));
 
-    const withoutBio = phaseRows
-      .filter(r => r[5] === "لا")
-      .map(r => Number(r[4]))
-      .filter(n => !isNaN(n));
-
-    const allDur = phaseRows
-      .map(r => Number(r[4]))
-      .filter(n => !isNaN(n));
-
-    const avg = arr => arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
+    const avg     = arr => arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
     const safeMin = arr => arr.length ? Math.min(...arr) : 0;
     const safeMax = arr => arr.length ? Math.max(...arr) : 0;
-    const pct = (n, total) => total ? Math.round((n / total) * 100) + "%" : "0%";
-
-    const total = allDur.length;
+    const pct     = (n, total) => total ? Math.round((n / total) * 100) + "%" : "0%";
+    const total   = allDur.length;
 
     sheet.getRange(writeRow, 2, 1, 6)
+      .breakApart()
       .merge()
       .setValue("📊 ملخص إحصائي — " + phase)
       .setBackground("#1b5e20")
@@ -206,176 +235,125 @@ function refreshStats(sheet) {
       .setFontWeight("bold")
       .setFontSize(12)
       .setHorizontalAlignment("center");
-
     sheet.getRange(writeRow, 9).setValue(STATS_MARKER);
     writeRow++;
 
     sheet.getRange(writeRow, 2, 1, 6)
-      .setValues([[
-        "الفئة",
-        "عدد الحجاج",
-        "متوسط الزمن (ثانية)",
-        "الزمن الأدنى (ثانية)",
-        "الزمن الأعلى (ثانية)",
-        "النسبة من الإجمالي"
-      ]])
+      .setValues([["الفئة","عدد الحجاج","متوسط الزمن (ثانية)","الزمن الأدنى (ثانية)","الزمن الأعلى (ثانية)","النسبة من الإجمالي"]])
       .setBackground("#a5d6a7")
       .setFontWeight("bold")
       .setHorizontalAlignment("center");
-
     sheet.getRange(writeRow, 9).setValue(STATS_MARKER);
     writeRow++;
 
     const statsData = [
-      [
-        "المسجل لهم بصمة",
-        withBio.length,
-        avg(withBio),
-        safeMin(withBio),
-        safeMax(withBio),
-        pct(withBio.length, total)
-      ],
-      [
-        "غير المسجل لهم بصمة",
-        withoutBio.length,
-        avg(withoutBio),
-        safeMin(withoutBio),
-        safeMax(withoutBio),
-        pct(withoutBio.length, total)
-      ],
-      [
-        "الإجمالي",
-        total,
-        avg(allDur),
-        safeMin(allDur),
-        safeMax(allDur),
-        "—"
-      ]
+      ["المسجل لهم بصمة",    withBio.length,    avg(withBio),    safeMin(withBio),    safeMax(withBio),    pct(withBio.length, total)],
+      ["غير المسجل لهم بصمة", withoutBio.length, avg(withoutBio), safeMin(withoutBio), safeMax(withoutBio), pct(withoutBio.length, total)],
+      ["الإجمالي",             total,             avg(allDur),     safeMin(allDur),     safeMax(allDur),     "—"]
     ];
 
     sheet.getRange(writeRow, 2, statsData.length, 6)
       .setValues(statsData)
       .setBackground("#e8f5e9")
       .setHorizontalAlignment("center");
+    sheet.getRange(writeRow, 3, statsData.length, 4).setNumberFormat("0");
+    sheet.getRange(writeRow, 7, statsData.length, 1).setNumberFormat("@");
 
     sheet.getRange(writeRow + 2, 2, 1, 6)
       .setBackground("#c8e6c9")
       .setFontWeight("bold");
 
-    for (let r = 0; r < statsData.length; r++) {
-      sheet.getRange(writeRow + r, 9).setValue(STATS_MARKER);
-    }
+    sheet.getRange(writeRow, 9, statsData.length, 1)
+      .setValues(statsData.map(() => [STATS_MARKER]));
 
     writeRow += statsData.length + 1;
   }
 
   formatHeader(sheet);
   formatDataRows(sheet);
-  autoResize(sheet);
 }
 
-function clearStatsSection(sheet) {
+function formatDataRows(sheet) {
   const lastRow = sheet.getLastRow();
-
   if (lastRow < 2) return;
 
-  const values = sheet.getRange(1, 1, lastRow, 9).getValues();
+  const numRows = lastRow - 1;
+  const col1 = sheet.getRange(2, 1, numRows, 1).getValues();
+  const col9 = sheet.getRange(2, 9, numRows, 1).getValues();
 
-  for (let i = values.length; i >= 2; i--) {
-    if (String(values[i - 1][8]).trim() === STATS_MARKER) {
-      sheet.deleteRow(i);
+  let lastDataRow = 1;
+  for (let i = numRows - 1; i >= 0; i--) {
+    if (String(col1[i][0]).trim() !== "" && String(col9[i][0]).trim() !== STATS_MARKER) {
+      lastDataRow = i + 2;
+      break;
     }
   }
 
-  const newLastRow = sheet.getLastRow();
+  if (lastDataRow < 2) return;
 
-  for (let r = newLastRow; r >= 2; r--) {
-    const row = sheet.getRange(r, 1, 1, 9).getValues()[0];
-    const isEmpty = row.every(c => String(c).trim() === "");
+  sheet.getRange(2, 1, lastDataRow - 1, 9)
+    .setBackground(null)
+    .setFontColor("black")
+    .setFontWeight("normal")
+    .setHorizontalAlignment("center");
+}
 
-    if (isEmpty) {
-      sheet.deleteRow(r);
-    }
-  }
+function resequenceCounters(sheet) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
+  const countersByPhase = {};
+
+  const col2Values = data.map(row => {
+    const recordId = String(row[0]).trim();
+    const marker   = String(row[8]).trim();
+
+    if (recordId === "" || marker === STATS_MARKER) return [row[1]];
+
+    const phase = String(row[7]).trim() || "غير محدد";
+    if (!countersByPhase[phase]) countersByPhase[phase] = 0;
+    countersByPhase[phase]++;
+    return [countersByPhase[phase]];
+  });
+
+  sheet.getRange(2, 2, col2Values.length, 1).setValues(col2Values);
 }
 
 function getNextCounter(sheet, phase) {
   const data = sheet.getDataRange().getValues();
-
   const phaseRows = data.slice(1).filter(row =>
     String(row[0]).trim() !== "" &&
     String(row[7]).trim() === String(phase).trim() &&
     String(row[8]).trim() !== STATS_MARKER
   );
-
   return phaseRows.length + 1;
-}
-
-function resequenceCounters(sheet) {
-  const lastRow = sheet.getLastRow();
-
-  if (lastRow < 2) return;
-
-  const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
-
-  const countersByPhase = {};
-
-  for (let i = 0; i < data.length; i++) {
-    const row = data[i];
-
-    if (String(row[0]).trim() === "") continue;
-    if (String(row[8]).trim() === STATS_MARKER) continue;
-
-    const phase = String(row[7]).trim() || "غير محدد";
-
-    if (!countersByPhase[phase]) countersByPhase[phase] = 0;
-
-    countersByPhase[phase]++;
-
-    sheet.getRange(i + 2, 2).setValue(countersByPhase[phase]);
-  }
 }
 
 function findRowById(sheet, recordId) {
   const data = sheet.getDataRange().getValues();
-
   for (let i = 1; i < data.length; i++) {
     if (String(data[i][8]).trim() === STATS_MARKER) continue;
-
-    if (String(data[i][0]).trim() === String(recordId).trim()) {
-      return i + 1;
-    }
+    if (String(data[i][0]).trim() === String(recordId).trim()) return i + 1;
   }
-
   return -1;
 }
 
 function getOrCreateSpreadsheet() {
   const files = DriveApp.getFilesByName(SPREADSHEET_NAME);
-
-  if (files.hasNext()) {
-    return SpreadsheetApp.open(files.next());
-  }
-
+  if (files.hasNext()) return SpreadsheetApp.open(files.next());
   return SpreadsheetApp.create(SPREADSHEET_NAME);
 }
 
 function getOrCreateSheet(ss, sheetName) {
   let sheet = ss.getSheetByName(sheetName);
-
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(HEADERS);
     sheet.setFrozenRows(1);
   }
-
   formatHeader(sheet);
-
-  try {
-    sheet.hideColumns(1);
-    sheet.hideColumns(9);
-  } catch (e) {}
-
+  try { sheet.hideColumns(1); sheet.hideColumns(9); } catch (e) {}
   return sheet;
 }
 
@@ -385,80 +363,121 @@ function formatHeader(sheet) {
     .setFontWeight("bold")
     .setBackground("#c8e6c9")
     .setHorizontalAlignment("center");
-
   sheet.setFrozenRows(1);
 }
 
-function formatDataRows(sheet) {
-  const lastRow = sheet.getLastRow();
-
-  if (lastRow < 2) return;
-
-  const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
-
-  for (let i = 0; i < data.length; i++) {
-    const rowNumber = i + 2;
-    const marker = String(data[i][8]).trim();
-    const recordId = String(data[i][0]).trim();
-
-    if (marker === STATS_MARKER || recordId === "") continue;
-
-    sheet.getRange(rowNumber, 1, 1, 9)
-      .setBackground(null)
-      .setFontColor("black")
-      .setFontWeight("normal")
-      .setHorizontalAlignment("center");
-  }
-}
-
-function autoResize(sheet) {
-  try {
-    sheet.autoResizeColumns(2, 7);
-  } catch (e) {}
-}
-
 function sanitizeSheetName(name) {
-  return String(name)
-    .replace(/[\/\\?\*\[\]':]/g, "_")
-    .substring(0, 100);
+  return String(name).replace(/[\/\\?\*\[\]':]/g, "_").substring(0, 100);
 }
 
 function normalizeDate(value) {
   if (!value) return "";
-
-  if (value instanceof Date) {
-    return Utilities.formatDate(value, Session.getScriptTimeZone(), "dd/MM/yyyy");
-  }
-
+  if (value instanceof Date) return Utilities.formatDate(value, Session.getScriptTimeZone(), "dd/MM/yyyy");
   const text = String(value);
-
   if (text.includes("T")) {
     const d = new Date(text);
-    if (!isNaN(d)) {
-      return Utilities.formatDate(d, Session.getScriptTimeZone(), "dd/MM/yyyy");
-    }
+    if (!isNaN(d)) return Utilities.formatDate(d, Session.getScriptTimeZone(), "dd/MM/yyyy");
   }
-
   return text;
 }
 
 function normalizeTime(value) {
   if (!value) return "";
-
-  if (value instanceof Date) {
-    return Utilities.formatDate(value, Session.getScriptTimeZone(), "hh:mm a");
-  }
-
+  if (value instanceof Date) return Utilities.formatDate(value, Session.getScriptTimeZone(), "hh:mm a");
   const text = String(value);
-
   if (text.includes("T")) {
     const d = new Date(text);
-    if (!isNaN(d)) {
-      return Utilities.formatDate(d, Session.getScriptTimeZone(), "hh:mm a");
-    }
+    if (!isNaN(d)) return Utilities.formatDate(d, Session.getScriptTimeZone(), "hh:mm a");
   }
-
   return text;
+}
+
+function fixStats() {
+  const ss = getOrCreateSpreadsheet();
+  ss.getSheets().forEach(sheet => { refreshStats(sheet); });
+}
+
+function removeDuplicates() {
+  const ss = getOrCreateSpreadsheet();
+  let totalRemoved = 0;
+
+  ss.getSheets().forEach(sheet => {
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+
+    const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
+    const seen = new Set();
+    const rowsToDelete = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const recordId = String(data[i][0]).trim();
+      const marker   = String(data[i][8]).trim();
+
+      if (recordId === "" || marker === STATS_MARKER) continue;
+
+      if (seen.has(recordId)) {
+        rowsToDelete.push(i + 2);
+      } else {
+        seen.add(recordId);
+      }
+    }
+
+    for (let i = rowsToDelete.length - 1; i >= 0; i--) {
+      sheet.deleteRow(rowsToDelete[i]);
+    }
+
+    totalRemoved += rowsToDelete.length;
+
+    if (rowsToDelete.length > 0) {
+      resequenceCounters(sheet);
+      formatDataRows(sheet);
+      refreshStats(sheet);
+    }
+
+    Logger.log(sheet.getName() + ': حُذف ' + rowsToDelete.length + ' تكرار');
+  });
+
+  Logger.log('المجموع: ' + totalRemoved + ' صف مكرر محذوف');
+}
+
+function removeShortEntries() {
+  const ss = getOrCreateSpreadsheet();
+  let totalRemoved = 0;
+
+  ss.getSheets().forEach(sheet => {
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+
+    const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
+    const rowsToDelete = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const recordId = String(data[i][0]).trim();
+      const marker   = String(data[i][8]).trim();
+      if (recordId === "" || marker === STATS_MARKER) continue;
+
+      const dur = Number(data[i][4]);
+      if (!isNaN(dur) && dur < 10) {
+        rowsToDelete.push(i + 2);
+      }
+    }
+
+    for (let i = rowsToDelete.length - 1; i >= 0; i--) {
+      sheet.deleteRow(rowsToDelete[i]);
+    }
+
+    totalRemoved += rowsToDelete.length;
+
+    if (rowsToDelete.length > 0) {
+      resequenceCounters(sheet);
+      formatDataRows(sheet);
+      refreshStats(sheet);
+    }
+
+    Logger.log(sheet.getName() + ': حُذف ' + rowsToDelete.length + ' عينة قصيرة');
+  });
+
+  Logger.log('المجموع: ' + totalRemoved + ' عينة محذوفة (أقل من 10 ثواني)');
 }
 
 function jsonResponse(obj) {
