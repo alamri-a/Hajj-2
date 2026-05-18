@@ -21,6 +21,7 @@
       <option value="مطار الملك عبدالعزيز">مطار الملك عبدالعزيز</option>
       <option value="مطار الأمير محمد بن عبدالعزيز">مطار الأمير محمد بن عبدالعزيز</option>
       <option value="حالة عمار">حالة عمار</option>
+      <option value="__summary__">📊 ملخص الأداء الإجمالي</option>
     </select>
 
     <div class="modal-custom">
@@ -49,6 +50,45 @@
   </div>
   <img src="Passports1.PNG" class="status-logo" alt="الجوازات">
 </div>
+
+<!-- ===== ملخص الأداء الإجمالي ===== -->
+<div id="summaryView" style="display:none; max-width:820px; margin:0 auto; padding:20px 16px;">
+  <div class="perf-summary">
+    <div class="perf-title"><i data-lucide="bar-chart-2" class="title-icon"></i> ملخص الأداء الإجمالي — جميع المنافذ</div>
+    <p id="summaryPhaseLabel" style="color:#666; font-size:15px; margin-bottom:18px;"></p>
+    <div class="metric-cards">
+      <div class="metric-card">
+        <i data-lucide="users" class="metric-icon-svg"></i>
+        <div class="metric-label">عدد الحجاج</div>
+        <div class="metric-value" id="sc-total">—</div>
+      </div>
+      <div class="metric-card">
+        <i data-lucide="clock" class="metric-icon-svg mc-clock"></i>
+        <div class="metric-label">متوسط زمن (ث)</div>
+        <div class="metric-value" id="sc-avg">—</div>
+      </div>
+      <div class="metric-card">
+        <i data-lucide="arrow-down" class="metric-icon-svg mc-down"></i>
+        <div class="metric-label">أدنى زمن (ث)</div>
+        <div class="metric-value" id="sc-min">—</div>
+      </div>
+      <div class="metric-card">
+        <i data-lucide="arrow-up" class="metric-icon-svg mc-up"></i>
+        <div class="metric-label">أعلى زمن (ث)</div>
+        <div class="metric-value" id="sc-max">—</div>
+      </div>
+      <div class="metric-card">
+        <i data-lucide="percent" class="metric-icon-svg mc-pct"></i>
+        <div class="metric-label">نسبة البصمة</div>
+        <div class="metric-value" id="sc-bio">—</div>
+      </div>
+    </div>
+    <div class="perf-footer"><i data-lucide="info" class="section-icon-sm"></i> جميع المنافذ مجمعة · يتحدث بإعادة التحميل</div>
+  </div>
+</div>
+
+<!-- ===== المحتوى الرئيسي ===== -->
+<div id="mainContent">
 
 <!-- ===== أزرار التحكم العامة ===== -->
 <div class="controls-bar">
@@ -217,7 +257,7 @@
     </div>
   </div>
 
-  <!-- ===== ملخص الأداء ===== -->
+  <!-- ===== ملخص الأداء المحلي ===== -->
   <div class="perf-summary">
     <div class="perf-title"><i data-lucide="bar-chart-2" class="title-icon"></i> ملخص الأداء</div>
     <div class="metric-cards">
@@ -250,6 +290,8 @@
     <div class="perf-footer"><i data-lucide="info" class="section-icon-sm"></i> جميع الأوقات محسوبة بالثواني</div>
   </div>
 </div>
+
+</div><!-- /mainContent -->
 
 <script src="script.js"></script>
 <script>lucide.createIcons();</script>
