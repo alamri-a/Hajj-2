@@ -113,7 +113,12 @@ body {
   height: 26px;
   display: block;
   margin: 0 auto 6px;
-  color: #666;
+  color: #2e7d32;
+  background: #e8f5e9;
+  border-radius: 50%;
+  padding: 10px;
+  width: 46px;
+  height: 46px;
 }
 
 .status-sep { margin: 0 6px; color: #bbb; }
@@ -530,7 +535,7 @@ tfoot tr:last-child td { border-bottom: none; }
 .metric-value {
   font-size: 22px;
   font-weight: 700;
-  color: var(--text-dark);
+  color: #2e7d32;
 }
 
 .perf-footer {
@@ -546,8 +551,7 @@ tfoot tr:last-child td { border-bottom: none; }
 .summary-section-header {
   display: flex;
   align-items: center;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
+  flex-direction: row;
   gap: 12px;
   background: #e8f5e9;
   border-radius: 12px;
@@ -585,6 +589,13 @@ tfoot tr:last-child td { border-bottom: none; }
 
 #summaryView .metric-cards {
   grid-template-columns: repeat(3, 1fr);
+}
+
+#summaryTitle {
+  background: #e8f5e9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
 }
 
 /* ═══════════════════════════════════════
