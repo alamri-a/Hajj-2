@@ -91,6 +91,9 @@ async function loadSummaryData(phase) {
   const allIds = ["sc-total","sc-bio-with-pct","sc-bio-without-pct",
                   "sc-with-avg","sc-with-max","sc-with-min",
                   "sc-without-avg","sc-without-max","sc-without-min"];
+  document.getElementById("summaryTitle").innerHTML =
+    '<i data-lucide="bar-chart-2" class="title-icon"></i> ملخص الأداء لمرحلة ' + phase;
+  if (typeof lucide !== "undefined") lucide.createIcons();
   allIds.forEach(id => { document.getElementById(id).textContent = "..."; });
 
   if (API_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {

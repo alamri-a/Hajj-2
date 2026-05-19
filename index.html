@@ -54,7 +54,7 @@
 <!-- ===== ملخص الأداء الإجمالي ===== -->
 <div id="summaryView" style="display:none; max-width:820px; margin:0 auto; padding:20px 16px;">
   <div class="perf-summary">
-    <div class="perf-title"><i data-lucide="bar-chart-2" class="title-icon"></i> ملخص الأداء الإجمالي — جميع المنافذ</div>
+    <div class="perf-title" id="summaryTitle"><i data-lucide="bar-chart-2" class="title-icon"></i> ملخص الأداء الإجمالي — جميع المنافذ</div>
     <div class="metric-cards">
       <div class="metric-card">
         <i data-lucide="users" class="metric-icon-svg"></i>
@@ -63,17 +63,17 @@
       </div>
       <div class="metric-card">
         <i data-lucide="percent" class="metric-icon-svg mc-pct"></i>
-        <div class="metric-label">نسبة المسجل لهم بصمة مسبقاً</div>
+        <div class="metric-label">من سبق لهم القدوم</div>
         <div class="metric-value" id="sc-bio-with-pct">—</div>
       </div>
       <div class="metric-card">
         <i data-lucide="percent" class="metric-icon-svg"></i>
-        <div class="metric-label">نسبة الغير مسجل لهم بصمة مسبقاً</div>
+        <div class="metric-label">القادمون لأول مرة</div>
         <div class="metric-value" id="sc-bio-without-pct">—</div>
       </div>
     </div>
 
-    <div class="summary-section-title">المسجل لهم خصائص حيوية مسبقاً</div>
+    <div class="summary-section-title">من سبق لهم القدوم</div>
     <div class="metric-cards">
       <div class="metric-card">
         <i data-lucide="clock" class="metric-icon-svg mc-clock"></i>
@@ -92,7 +92,7 @@
       </div>
     </div>
 
-    <div class="summary-section-title">الغير مسجل لهم خصائص حيوية مسبقاً</div>
+    <div class="summary-section-title">القادمون لأول مرة</div>
     <div class="metric-cards">
       <div class="metric-card">
         <i data-lucide="clock" class="metric-icon-svg mc-clock"></i>
