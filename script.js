@@ -115,6 +115,9 @@ async function loadSummaryData(phase) {
       document.getElementById("sc-without-avg").textContent    = d.withoutBio.avg;
       document.getElementById("sc-without-max").textContent    = d.withoutBio.max;
       document.getElementById("sc-without-min").textContent    = d.withoutBio.min;
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById("summaryUpdateTime").textContent = "آخر تحديث: اليوم - " + timeStr;
     } else {
       allIds.forEach(id => { document.getElementById(id).textContent = "خطأ"; });
     }

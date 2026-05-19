@@ -543,14 +543,44 @@ tfoot tr:last-child td { border-bottom: none; }
 /* ═══════════════════════════════════════
    ملخص الأداء الإجمالي — تنسيق خاص
 ═══════════════════════════════════════ */
-.summary-section-title {
-  text-align: center;
+.summary-section-header {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #e8f5e9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 32px 0 12px;
   font-size: 1rem;
   font-weight: bold;
   color: #1b5e20;
-  margin: 40px 0 10px;
-  padding: 6px 0;
-  border-bottom: 2px solid #c8e6c9;
+}
+
+.summary-section-icon {
+  background: #2e7d32;
+  color: white;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  flex-shrink: 0;
+}
+
+.summary-update-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  color: #999;
+  font-size: 12px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
 }
 
 #summaryView .metric-cards {
