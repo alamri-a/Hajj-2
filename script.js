@@ -71,10 +71,14 @@ function saveSetupChoice() {
 }
 
 function resetFingerprint(id) {
+  const radios = document.querySelectorAll(`input[name="fingerprint${id}"]`);
   if (currentPhase === "المغادرة") {
     document.querySelector(`input[name="fingerprint${id}"][value="نعم"]`).checked = true;
+    radios.forEach(r => { r.disabled = true; });
+    document.querySelectorAll(`label.radio-card:has(input[name="fingerprint${id}"])`).forEach(l => l.classList.add("radio-locked"));
   } else {
-    document.querySelectorAll(`input[name="fingerprint${id}"]`).forEach(r => r.checked = false);
+    radios.forEach(r => { r.checked = false; r.disabled = false; });
+    document.querySelectorAll(`label.radio-card:has(input[name="fingerprint${id}"])`).forEach(l => l.classList.remove("radio-locked"));
   }
 }
 
